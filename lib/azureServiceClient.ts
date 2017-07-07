@@ -93,8 +93,18 @@ export class AzureServiceClient extends msRest.ServiceClient {
    */
   async sendLongRunningRequest(request: msRest.RequestPrepareOptions | msRest.WebResource, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
     let self = this;
-    let initialResponse: msRest.HttpOperationResponse = await self.sendRequest(request);
-    let finalResponse: msRest.HttpOperationResponse = await self.getLongRunningOperationResult(initialResponse, options);
+    let initialResponse: msRest.HttpOperationResponse;
+    try {
+      initialResponse = await self.sendRequest(request);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    let finalResponse: msRest.HttpOperationResponse;
+    try {
+      finalResponse = await self.getLongRunningOperationResult(initialResponse, options);
+    } catch (err) {
+      return Promise.reject(err);
+    }
     return Promise.resolve(finalResponse);
   }
 
@@ -304,10 +314,11 @@ export class AzureServiceClient extends msRest.ServiceClient {
     // Construct URL
     let requestUrl = operationUrl.replace(' ', '%20');
     // Create HTTP request object
-    let httpRequest = new msRest.WebResource();
-    httpRequest.method = msRest.HttpMethods.GET;
-    httpRequest.headers = {};
-    httpRequest.url = requestUrl;
+    let httpRequest: msRest.RequestPrepareOptions = {
+      method: msRest.HttpMethods.GET,
+      url: requestUrl,
+      headers: {}
+    };
     if (options) {
       for (let headerName in options.customHeaders) {
         if (options.customHeaders.hasOwnProperty(headerName)) {
@@ -328,7 +339,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       let error = new msRest.RestError(`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
         `when polling for operation status.`);
       error.statusCode = statusCode;
-      error.request = msRest.stripRequest(httpRequest);
+      error.request = msRest.stripRequest(operationResponse.request);
       error.response = operationResponse.response;
       try {
         error.body = JSON.parse(responseBody);

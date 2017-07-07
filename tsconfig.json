@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-        "module": "es2015",
+        "module": "commonjs",
         "noImplicitAny": true,
         "preserveConstEnums": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "newLine": "LF",
         "target": "es2016",
         "moduleResolution": "node",
@@ -26,6 +26,7 @@
     ],
     "include": [
         "lib/**/*.ts",
-        "test/**/*.ts"
+        "test/**/*.ts",
+        "sample.ts"
     ]
 }
