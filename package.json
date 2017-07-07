@@ -1,0 +1,64 @@
+{
+  "name": "ms-rest-azure",
+  "author": {
+    "name": "Microsoft Corporation",
+    "email": "azsdkteam@microsoft.com",
+    "url": "https://github.com/Azure/azure-sdk-for-node"
+  },
+  "version": "3.0.0",
+  "description": "Client Runtime for Node.js client libraries generated using AutoRest",
+  "tags": [
+    "node",
+    "microsoft",
+    "autorest",
+    "clientruntime"
+  ],
+  "keywords": [
+    "node",
+    "microsoft",
+    "autorest",
+    "clientruntime"
+  ],
+  "main": "./lib/msRestAzure.js",
+  "types": "./dist/msRestAzure.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^7.0.10",
+    "@types/uuid": "^2.0.29",
+    "buffer": "^5.0.6",
+    "is-stream": "^1.1.0",
+    "moment": "^2.14.1",
+    "uuid": "^3.0.1",
+    "ms-rest": "../ms-rest"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.40",
+    "@types/should": "^8.1.30",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^4.3.1",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-tslint": "^8.0.0",
+    "gulp-typescript": "^3.1.6",
+    "jshint": "2.9.4",
+    "mocha": "^3.2.0",
+    "run-sequence": "^1.2.2",
+    "should": "5.2.0",
+    "ts-loader": "^2.0.3",
+    "tslint": "^5.2.0",
+    "typescript": "^2.3.2",
+    "webpack": "^2.5.1"
+  },
+  "homepage": "https://github.com/Azure/azure-sdk-for-node/runtime/ms-rest",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Azure/azure-sdk-for-node.git"
+  },
+  "bugs": {
+    "url": "http://github.com/Azure/azure-sdk-for-node/issues"
+  },
+  "scripts": {
+    "test": "npm install && npm -s run-script unit",
+    "unit": "mocha -t 50000 dist/test",
+    "build": "webpack"
+  }
+}
