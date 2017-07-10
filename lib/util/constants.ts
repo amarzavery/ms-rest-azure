@@ -17,7 +17,20 @@ const Constants = {
     Canceled: 'Canceled'
   },
 
-  DEFAULT_LANGUAGE: 'en-us'
+  /**
+   * The default language in the request header.
+   *
+   * @const
+   * @type {string}
+   */
+  DEFAULT_LANGUAGE: 'en-us',
+
+  /**
+   * The ms-rest-azure version.
+   * @const
+   * @type {string}
+   */
+  msRestAzureVersion: '3.0.0'
 };
 
 export default Constants;

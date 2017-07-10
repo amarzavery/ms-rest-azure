@@ -19,8 +19,8 @@
     "autorest",
     "clientruntime"
   ],
-  "main": "./lib/msRestAzure.js",
-  "types": "./dist/msRestAzure.ts",
+  "main": "./dist/lib/msRestAzure.js",
+  "types": "./lib/msRestAzure.ts",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^7.0.10",
@@ -29,7 +29,7 @@
     "is-stream": "^1.1.0",
     "moment": "^2.14.1",
     "uuid": "^3.0.1",
-    "ms-rest": "../ms-rest"
+    "ms-rest": "amarzavery/ms-rest#master"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
