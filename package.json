@@ -19,7 +19,7 @@
     "autorest",
     "clientruntime"
   ],
-  "main": "./dist/lib/msRestAzure.js",
+  "main": "./dist/ms-rest-azure/lib/msRestAzure.js",
   "types": "./lib/msRestAzure.ts",
   "license": "MIT",
   "dependencies": {
