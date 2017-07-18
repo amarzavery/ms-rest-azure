@@ -1,6 +1,6 @@
+"use strict";
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
-'use strict';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import * as msRest from '../../ms-rest/lib/msRest';
-import Constants from './util/constants';
-import * as fs from 'fs';
-import PollingState from './pollingState';
-const LroStates = Constants.LongRunningOperationStates;
+Object.defineProperty(exports, "__esModule", { value: true });
+const msRest = require("ms-rest");
+const constants_1 = require("./util/constants");
+const pollingState_1 = require("./pollingState");
+const LroStates = constants_1.default.LongRunningOperationStates;
 /**
  * @class
  * Initializes a new instance of the AzureServiceClient class.
@@ -23,14 +23,14 @@ const LroStates = Constants.LongRunningOperationStates;
  * UserTokenCredentials object used for authentication.
  * @param {AzureServiceClientOptions} options - The parameter options used by AzureServiceClient
  */
-export class AzureServiceClient extends msRest.ServiceClient {
+class AzureServiceClient extends msRest.ServiceClient {
     constructor(credentials, options) {
         super(credentials, options);
-        this.acceptLanguage = Constants.DEFAULT_LANGUAGE;
+        this.acceptLanguage = constants_1.default.DEFAULT_LANGUAGE;
         this.generateClientRequestId = true;
         this.longRunningOperationRetryTimeout = 30;
         this.rpRegistrationRetryTimeout = 30;
-        this.acceptLanguage = Constants.DEFAULT_LANGUAGE;
+        this.acceptLanguage = constants_1.default.DEFAULT_LANGUAGE;
         this.generateClientRequestId = true;
         this.longRunningOperationRetryTimeout = 30;
         if (!options)
@@ -48,9 +48,8 @@ export class AzureServiceClient extends msRest.ServiceClient {
             this.rpRegistrationRetryTimeout = options.rpRegistrationRetryTimeout;
         }
         try {
-            const packageJson = JSON.parse(fs.readFileSync("../package.json", { encoding: "utf8" }));
-            const moduleName = packageJson.name;
-            const moduleVersion = packageJson.version;
+            const moduleName = 'ms-rest-azure';
+            const moduleVersion = constants_1.default.msRestAzureVersion;
             this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
         }
         catch (err) {
@@ -114,9 +113,9 @@ export class AzureServiceClient extends msRest.ServiceClient {
                 return Promise.reject(`Unexpected polling status code from long running operation ` +
                     `"${resultOfInitialRequest.response.status}" for method "${initialRequestMethod}".`);
             }
-            let pollingState = null;
+            let pollingState;
             try {
-                pollingState = new PollingState(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
+                pollingState = new pollingState_1.default(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
                 pollingState.optionsOfInitialRequest = options;
             }
             catch (error) {
@@ -160,7 +159,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
      */
     updateStateFromAzureAsyncOperationHeader(pollingState, inPostOrDelete = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = null;
+            let result;
             try {
                 result = yield this.getStatus(pollingState.azureAsyncOperationHeaderLink, pollingState.optionsOfInitialRequest);
             }
@@ -200,7 +199,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
      */
     updateStateFromLocationHeader(method, pollingState) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = null;
+            let result;
             try {
                 result = yield this.getStatus(pollingState.locationHeaderLink, pollingState.optionsOfInitialRequest);
             }
@@ -247,7 +246,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
      */
     updateStateFromGetResourceOperation(resourceUrl, pollingState) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = null;
+            let result;
             try {
                 result = yield this.getStatus(resourceUrl, pollingState.optionsOfInitialRequest);
             }
@@ -288,14 +287,15 @@ export class AzureServiceClient extends msRest.ServiceClient {
             let requestUrl = operationUrl.replace(' ', '%20');
             // Create HTTP request object
             let httpRequest = {
-                method: msRest.HttpMethods.GET,
+                method: 'GET',
                 url: requestUrl,
                 headers: {}
             };
             if (options) {
-                for (let headerName in options.customHeaders) {
-                    if (options.customHeaders.hasOwnProperty(headerName)) {
-                        httpRequest.headers[headerName] = options.customHeaders[headerName];
+                let customHeaders = options.customHeaders;
+                for (let headerName in customHeaders) {
+                    if (customHeaders.hasOwnProperty(headerName)) {
+                        httpRequest.headers[headerName] = customHeaders[headerName];
                     }
                 }
             }
@@ -329,4 +329,5 @@ export class AzureServiceClient extends msRest.ServiceClient {
         });
     }
 }
+exports.AzureServiceClient = AzureServiceClient;
 //# sourceMappingURL=azureServiceClient.js.map

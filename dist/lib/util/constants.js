@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 'use strict';
-const Constants = {
+Object.defineProperty(exports, "__esModule", { value: true });
+var Constants = {
     /**
     * Defines constants for long running operation states.
     *
@@ -14,7 +15,19 @@ const Constants = {
         Failed: 'Failed',
         Canceled: 'Canceled'
     },
-    DEFAULT_LANGUAGE: 'en-us'
+    /**
+     * The default language in the request header.
+     *
+     * @const
+     * @type {string}
+     */
+    DEFAULT_LANGUAGE: 'en-us',
+    /**
+     * The ms-rest-azure version.
+     * @const
+     * @type {string}
+     */
+    msRestAzureVersion: '3.0.0'
 };
-export default Constants;
+exports.default = Constants;
 //# sourceMappingURL=constants.js.map

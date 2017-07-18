@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
-'use strict';
 import Constants from './util/constants';
-import * as msRest from '../../ms-rest/lib/msRest';
+import * as msRest from 'ms-rest';
 const LroStates = Constants.LongRunningOperationStates;
 /**
  * @class
@@ -66,7 +65,7 @@ export default class PollingState {
     }
     /**
      * Update cached data using the provided response object
-     * @param {nodeFetch.Response} [response] - provider response object.
+     * @param {Response} [response] - provider response object.
      */
     updateResponse(response) {
         this.response = response;
@@ -117,7 +116,7 @@ export default class PollingState {
      * @returns {msRest.RestError} The RestError defined in the runtime.
      */
     getRestError(err) {
-        let errMsg = null;
+        let errMsg;
         let errCode = null;
         let error = new msRest.RestError('');
         error.request = msRest.stripRequest(this.request);

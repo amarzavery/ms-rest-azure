@@ -1,11 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 
-'use strict';
-
 import Constants from './util/constants';
-import * as msRest from '../../ms-rest/lib/msRest';
-import * as nodeFetch from 'node-fetch';
+import * as msRest from 'ms-rest';
 const LroStates = Constants.LongRunningOperationStates;
 
 /**
@@ -26,9 +23,9 @@ export default class PollingState {
    */
   request: msRest.WebResource;
   /**
-   * @param {nodeFetch.Response} [response] - The response object to extract longrunning operation status.
+   * @param {Response} [response] - The response object to extract longrunning operation status.
    */
-  response: nodeFetch.Response;
+  response: Response;
   /**
    * @param {any} [resource] - Provides information about the response body received in the polling request. Particularly useful when polling via provisioningState.
    */
@@ -109,13 +106,13 @@ export default class PollingState {
 
   /**
    * Update cached data using the provided response object
-   * @param {nodeFetch.Response} [response] - provider response object.
+   * @param {Response} [response] - provider response object.
    */
-  updateResponse(response: nodeFetch.Response) {
+  updateResponse(response: Response) {
     this.response = response;
     if (response && response.headers) {
-      let asyncOperationHeader: string = response.headers.get('azure-asyncoperation');
-      let locationHeader: string = response.headers.get('location');
+      let asyncOperationHeader: string | null | undefined = response.headers.get('azure-asyncoperation');
+      let locationHeader: string | null | undefined = response.headers.get('location');
       if (asyncOperationHeader) {
         this.azureAsyncOperationHeaderLink = asyncOperationHeader;
       }
@@ -135,7 +132,7 @@ export default class PollingState {
       return this.retryTimeout * 1000;
     }
     if (this.response) {
-      let retryAfter: string = this.response.headers.get('retry-after');
+      let retryAfter: string | null | undefined = this.response.headers.get('retry-after');
       if (retryAfter) {
         return parseInt(retryAfter) * 1000;
       }
@@ -147,7 +144,7 @@ export default class PollingState {
    * Returns long running operation result.
    * @returns {msRest.HttpOperationResponse} HttpOperationResponse
    */
-  getOperationResponse() {
+  getOperationResponse(): msRest.HttpOperationResponse {
     let result = new msRest.HttpOperationResponse(this.request, this.response);
     if (this.resource && typeof this.resource.valueOf() === 'string') {
       result.body = this.resource;
@@ -162,19 +159,19 @@ export default class PollingState {
    * @param {Error} err - The error object.
    * @returns {msRest.RestError} The RestError defined in the runtime.
    */
-  getRestError(err?: Error) {
-    let errMsg: string = null;
-    let errCode: string = null;
+  getRestError(err?: Error): msRest.RestError {
+    let errMsg: string;
+    let errCode: string | null = null;
 
     let error = new msRest.RestError('');
     error.request = msRest.stripRequest(this.request);
     error.response = this.response;
-    let responseBody: string = this.resultOfInitialRequest.body as string;
+    let responseBody: string | null = this.resultOfInitialRequest.body as string;
     let parsedResponse: any = null;
     try {
       if (responseBody !== null && responseBody !== undefined) {
         if (responseBody === '') responseBody = null;
-        parsedResponse = JSON.parse(responseBody);
+        parsedResponse = JSON.parse(responseBody as string);
       }
     } catch (parseErr) {
       error.message = `Error "${parseErr.message}" occurred while deserializing the error ` +

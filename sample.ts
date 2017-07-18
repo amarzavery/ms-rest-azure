@@ -1,6 +1,6 @@
 'use strict';
 
-import * as msRest from '../ms-rest/lib/msRest';
+import * as msRest from 'ms-rest';
 import * as msRestAzure from './lib/msRestAzure';
 const clientOptions: msRestAzure.AzureServiceClientOptions = {
   filters: [new msRest.LogFilter()]
@@ -19,12 +19,12 @@ const apiVersion = '2017-06-01';
 // 1.4 click on try it out button.
 // 1.5 in the curl tab you will see the actual curl request that has the bearer token in it
 // 1.6 copy paste that token here. That token is valid for 1 hour
-const token = 'your token';
+const token = 'your-token';
 const creds = new msRest.TokenCredentials(token);
 const client = new msRestAzure.AzureServiceClient(creds, clientOptions);
 const req: msRest.RequestPrepareOptions = {
   url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Storage/storageAccounts/${accountName}?api-version=${apiVersion}`,
-  method: msRest.HttpMethods.PUT,
+  method: 'PUT',
   body: {
     location: location,
     sku: {
@@ -39,15 +39,15 @@ const req: msRest.RequestPrepareOptions = {
 };
 
 async function execute(req: msRest.RequestPrepareOptions): Promise<msRest.HttpOperationResponse> {
-  let res;
+  let res: msRest.HttpOperationResponse;
   try {
     res = await client.sendLongRunningRequest(req);
     console.dir(res);
     document.write(JSON.stringify(res));
+    return Promise.resolve(res);
   } catch (err) {
-    console.dir(err);
+    return Promise.reject(err);
   }
-  return Promise.resolve(res);
 }
 console.log("Hi There!!");
 // client.sendLongRunningRequest(req).then((res: msRest.HttpOperationResponse) => {
@@ -55,7 +55,7 @@ console.log("Hi There!!");
 // }).catch((err) => {
 //   console.dir(err);
 // });
-execute(req);
+execute(req).catch((err) => { console.dir(err); });
 
 for (var i = 1; i <= 20; i++) {
   console.log('Hello World ' + i);

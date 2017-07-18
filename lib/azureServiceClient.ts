@@ -1,11 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 
-'use strict';
-
-import * as msRest from '../../ms-rest/lib/msRest';
+import * as msRest from 'ms-rest';
 import Constants from './util/constants';
-import * as fs from 'fs';
 import PollingState from './pollingState';
 const LroStates = Constants.LongRunningOperationStates;
 
@@ -76,9 +73,8 @@ export class AzureServiceClient extends msRest.ServiceClient {
     }
 
     try {
-      const packageJson = JSON.parse(fs.readFileSync("../package.json", { encoding: "utf8" }));
-      const moduleName = packageJson.name;
-      const moduleVersion = packageJson.version;
+      const moduleName = 'ms-rest-azure';
+      const moduleVersion = Constants.msRestAzureVersion;
       this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
     } catch (err) {
       // do nothing
@@ -133,16 +129,16 @@ export class AzureServiceClient extends msRest.ServiceClient {
    */
   async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
     let self = this;
-    let initialRequestMethod: string = resultOfInitialRequest.request.method;
+    let initialRequestMethod: string = resultOfInitialRequest.request.method as msRest.HttpMethods;
 
     if (self.checkResponseStatusCodeFailed(resultOfInitialRequest)) {
       return Promise.reject(`Unexpected polling status code from long running operation ` +
         `"${resultOfInitialRequest.response.status}" for method "${initialRequestMethod}".`);
     }
-    let pollingState: PollingState = null;
+    let pollingState: PollingState;
     try {
       pollingState = new PollingState(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
-      pollingState.optionsOfInitialRequest = options;
+      pollingState.optionsOfInitialRequest =  options as msRest.RequestOptions;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -179,15 +175,15 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {boolean} inPostOrDelete - Invoked by Post Or Delete operation.
    */
   async updateStateFromAzureAsyncOperationHeader(pollingState: PollingState, inPostOrDelete: boolean = false): Promise<void> {
-    let result: msRest.HttpOperationResponse = null;
+    let result: msRest.HttpOperationResponse;
 
     try {
-      result = await this.getStatus(pollingState.azureAsyncOperationHeaderLink, pollingState.optionsOfInitialRequest);
+      result = await this.getStatus(pollingState.azureAsyncOperationHeaderLink as string, pollingState.optionsOfInitialRequest);
     } catch (err) {
       return Promise.reject(err);
     }
 
-    let responseBody: string = result.body as string;
+    let responseBody: string | null = result.body as string;
     if (responseBody === '') responseBody = null;
     let parsedResponse: {
       status: string;
@@ -196,7 +192,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
     };
 
     try {
-      parsedResponse = JSON.parse(responseBody);
+      parsedResponse = JSON.parse(responseBody as string);
     } catch (err) {
       let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
         `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`)
@@ -224,18 +220,18 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {PollingState} pollingState - The object to persist current operation state.
    */
   async updateStateFromLocationHeader(method: string, pollingState: PollingState): Promise<void> {
-    let result: msRest.HttpOperationResponse = null;
+    let result: msRest.HttpOperationResponse;
     try {
-      result = await this.getStatus(pollingState.locationHeaderLink, pollingState.optionsOfInitialRequest);
+      result = await this.getStatus(pollingState.locationHeaderLink as string, pollingState.optionsOfInitialRequest);
     } catch (err) {
       return Promise.reject(err);
     }
 
-    let responseBody: string = result.body as string;
+    let responseBody: string | null = result.body as string;
     if (responseBody === '') responseBody = null;
     let parsedResponse: any = null;
     try {
-      parsedResponse = JSON.parse(responseBody);
+      parsedResponse = JSON.parse(responseBody as string);
     } catch (err) {
       let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
         `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`)
@@ -267,14 +263,14 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {PollingState} pollingState - The object to persist current operation state.
    */
   async updateStateFromGetResourceOperation(resourceUrl: string, pollingState: PollingState): Promise<void> {
-    let result: msRest.HttpOperationResponse = null;
+    let result: msRest.HttpOperationResponse;
     try {
       result = await this.getStatus(resourceUrl, pollingState.optionsOfInitialRequest);
     } catch (err) {
       return Promise.reject(err);
     }
 
-    let responseBody: string = result.body as string;
+    let responseBody: string | null = result.body as string;
     if (responseBody === '') responseBody = null;
     let parsedResponse: {
       properties: {
@@ -288,7 +284,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       [key: string]: any;
     };
     try {
-      parsedResponse = JSON.parse(responseBody);
+      parsedResponse = JSON.parse(responseBody as string);
     } catch (err) {
       let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
         `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`)
@@ -315,14 +311,15 @@ export class AzureServiceClient extends msRest.ServiceClient {
     let requestUrl = operationUrl.replace(' ', '%20');
     // Create HTTP request object
     let httpRequest: msRest.RequestPrepareOptions = {
-      method: msRest.HttpMethods.GET,
+      method: 'GET',
       url: requestUrl,
       headers: {}
     };
     if (options) {
-      for (let headerName in options.customHeaders) {
-        if (options.customHeaders.hasOwnProperty(headerName)) {
-          httpRequest.headers[headerName] = options.customHeaders[headerName];
+      let customHeaders: { [key: string]: string } = (options.customHeaders as { [key: string]: string })
+      for (let headerName in customHeaders) {
+        if (customHeaders.hasOwnProperty(headerName)) {
+          (httpRequest.headers as { [key: string]: string })[headerName] = customHeaders[headerName];
         }
       }
     }
@@ -333,7 +330,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
     let statusCode = operationResponse.response.status;
-    let responseBody: string = operationResponse.body as string;
+    let responseBody: string | null = operationResponse.body as string;
     if (responseBody === '') responseBody = null;
     if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
       let error = new msRest.RestError(`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
@@ -342,10 +339,10 @@ export class AzureServiceClient extends msRest.ServiceClient {
       error.request = msRest.stripRequest(operationResponse.request);
       error.response = operationResponse.response;
       try {
-        error.body = JSON.parse(responseBody);
+        error.body = JSON.parse(responseBody as string);
       } catch (badResponse) {
         error.message += ` Error "${badResponse}" occured while deserializing the response body - "${responseBody}".`;
-        error.body = responseBody;
+        error.body = responseBody as string;
       }
       return Promise.reject(error);
     }

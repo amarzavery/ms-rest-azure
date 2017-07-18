@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "module": "es6",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "newLine": "LF",
+    "target": "es6",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "dist/browser",
+    "allowJs": false,
+    "declaration": true,
+    "declarationDir": "./typings",
+    "strict": true,
+    "strictNullChecks": true,
+    "lib": [
+      "dom",
+      "es2015",
+      "es2016"
+    ]
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "./lib/**/*.ts",
+    "./test/**/*.ts"
+  ]
+}
