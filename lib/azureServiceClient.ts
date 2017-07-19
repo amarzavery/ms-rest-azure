@@ -183,33 +183,18 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
 
-    let responseBody: string | null = result.body as string;
-    if (responseBody === '') responseBody = null;
-    let parsedResponse: {
-      status: string;
-      name: string;
-      [key: string]: any;
-    };
-
-    try {
-      parsedResponse = JSON.parse(responseBody as string);
-    } catch (err) {
-      let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-        `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`)
-      return Promise.reject(e);
-    }
+    let parsedResponse = result.bodyAsJson as {[key:string]: any};
 
     if (!parsedResponse || !parsedResponse.status) {
       return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
     }
-
     pollingState.status = parsedResponse.status;
     pollingState.error = parsedResponse.error;
     pollingState.updateResponse(result.response);
     pollingState.request = result.request;
     pollingState.resource = null;
     if (inPostOrDelete) {
-      pollingState.resource = result.body;
+      pollingState.resource = result.bodyAsJson;
     }
     return Promise.resolve();
   }
@@ -227,17 +212,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
 
-    let responseBody: string | null = result.body as string;
-    if (responseBody === '') responseBody = null;
-    let parsedResponse: any = null;
-    try {
-      parsedResponse = JSON.parse(responseBody as string);
-    } catch (err) {
-      let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-        `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`)
-      return Promise.reject(e);
-    }
-
+    let parsedResponse = result.bodyAsJson as { [key: string]: any };
     pollingState.updateResponse(result.response);
     pollingState.request = result.request;
     let statusCode = result.response.status;
@@ -270,27 +245,11 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
 
-    let responseBody: string | null = result.body as string;
-    if (responseBody === '') responseBody = null;
-    let parsedResponse: {
-      properties: {
-        provisioningState?: string;
-        [key: string]: any;
-      };
-      id: string;
-      name: string;
-      type: string;
-      location: string;
-      [key: string]: any;
-    };
-    try {
-      parsedResponse = JSON.parse(responseBody as string);
-    } catch (err) {
-      let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-        `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`)
-      return Promise.reject(e);
+    let parsedResponse = result.bodyAsJson as {[key:string]: any};
+    pollingState.status = LroStates.Succeeded;
+    if (parsedResponse && parsedResponse.properties && parsedResponse.properties.provisioningState) {
+      pollingState.status = parsedResponse.properties.provisioningState;
     }
-    pollingState.status = parsedResponse.properties.provisioningState || LroStates.Succeeded;
     pollingState.updateResponse(result.response);
     pollingState.request = result.request;
     pollingState.resource = parsedResponse;
@@ -330,8 +289,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
     let statusCode = operationResponse.response.status;
-    let responseBody: string | null = operationResponse.body as string;
-    if (responseBody === '') responseBody = null;
+    let responseBody = operationResponse.bodyAsJson;
     if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
       let error = new msRest.RestError(`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
         `when polling for operation status.`);
@@ -339,10 +297,10 @@ export class AzureServiceClient extends msRest.ServiceClient {
       error.request = msRest.stripRequest(operationResponse.request);
       error.response = operationResponse.response;
       try {
-        error.body = JSON.parse(responseBody as string);
+        error.body = responseBody;
       } catch (badResponse) {
-        error.message += ` Error "${badResponse}" occured while deserializing the response body - "${responseBody}".`;
-        error.body = responseBody as string;
+        error.message += ` Error "${badResponse}" occured while deserializing the response body - "${operationResponse.bodyAsText}".`;
+        error.body = operationResponse.bodyAsText;
       }
       return Promise.reject(error);
     }

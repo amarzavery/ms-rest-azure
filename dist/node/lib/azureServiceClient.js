@@ -166,18 +166,7 @@ class AzureServiceClient extends msRest.ServiceClient {
             catch (err) {
                 return Promise.reject(err);
             }
-            let responseBody = result.body;
-            if (responseBody === '')
-                responseBody = null;
-            let parsedResponse;
-            try {
-                parsedResponse = JSON.parse(responseBody);
-            }
-            catch (err) {
-                let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-                    `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`);
-                return Promise.reject(e);
-            }
+            let parsedResponse = result.bodyAsJson;
             if (!parsedResponse || !parsedResponse.status) {
                 return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
             }
@@ -187,7 +176,7 @@ class AzureServiceClient extends msRest.ServiceClient {
             pollingState.request = result.request;
             pollingState.resource = null;
             if (inPostOrDelete) {
-                pollingState.resource = result.body;
+                pollingState.resource = result.bodyAsJson;
             }
             return Promise.resolve();
         });
@@ -206,18 +195,7 @@ class AzureServiceClient extends msRest.ServiceClient {
             catch (err) {
                 return Promise.reject(err);
             }
-            let responseBody = result.body;
-            if (responseBody === '')
-                responseBody = null;
-            let parsedResponse = null;
-            try {
-                parsedResponse = JSON.parse(responseBody);
-            }
-            catch (err) {
-                let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-                    `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`);
-                return Promise.reject(e);
-            }
+            let parsedResponse = result.bodyAsJson;
             pollingState.updateResponse(result.response);
             pollingState.request = result.request;
             let statusCode = result.response.status;
@@ -253,19 +231,11 @@ class AzureServiceClient extends msRest.ServiceClient {
             catch (err) {
                 return Promise.reject(err);
             }
-            let responseBody = result.body;
-            if (responseBody === '')
-                responseBody = null;
-            let parsedResponse;
-            try {
-                parsedResponse = JSON.parse(responseBody);
+            let parsedResponse = result.bodyAsJson;
+            pollingState.status = LroStates.Succeeded;
+            if (parsedResponse && parsedResponse.properties && parsedResponse.properties.provisioningState) {
+                pollingState.status = parsedResponse.properties.provisioningState;
             }
-            catch (err) {
-                let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-                    `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`);
-                return Promise.reject(e);
-            }
-            pollingState.status = parsedResponse.properties.provisioningState || LroStates.Succeeded;
             pollingState.updateResponse(result.response);
             pollingState.request = result.request;
             pollingState.resource = parsedResponse;
@@ -307,9 +277,7 @@ class AzureServiceClient extends msRest.ServiceClient {
                 return Promise.reject(err);
             }
             let statusCode = operationResponse.response.status;
-            let responseBody = operationResponse.body;
-            if (responseBody === '')
-                responseBody = null;
+            let responseBody = operationResponse.bodyAsJson;
             if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
                 let error = new msRest.RestError(`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
                     `when polling for operation status.`);
@@ -317,11 +285,11 @@ class AzureServiceClient extends msRest.ServiceClient {
                 error.request = msRest.stripRequest(operationResponse.request);
                 error.response = operationResponse.response;
                 try {
-                    error.body = JSON.parse(responseBody);
+                    error.body = responseBody;
                 }
                 catch (badResponse) {
-                    error.message += ` Error "${badResponse}" occured while deserializing the response body - "${responseBody}".`;
-                    error.body = responseBody;
+                    error.message += ` Error "${badResponse}" occured while deserializing the response body - "${operationResponse.bodyAsText}".`;
+                    error.body = operationResponse.bodyAsText;
                 }
                 return Promise.reject(error);
             }

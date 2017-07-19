@@ -56,22 +56,7 @@ export default class PollingState {
     this.retryTimeout = retryTimeout;
     this.updateResponse(resultOfInitialRequest.response);
     this.request = resultOfInitialRequest.request;
-    //Parse response.body & assign it as the resource
-    try {
-      if (resultOfInitialRequest.body &&
-        typeof resultOfInitialRequest.body.valueOf() === 'string' &&
-        (resultOfInitialRequest.body as string).length > 0) {
-        this.resource = JSON.parse(resultOfInitialRequest.body as string);
-      } else {
-        this.resource = resultOfInitialRequest.body;
-      }
-    } catch (error) {
-      let deserializationError = new msRest.RestError(`Error "${error}" occurred in parsing the responseBody ' +
-        'while creating the PollingState for Long Running Operation- "${resultOfInitialRequest.body}"`);
-      deserializationError.request = resultOfInitialRequest.request;
-      deserializationError.response = resultOfInitialRequest.response;
-      throw deserializationError;
-    }
+    this.resource = resultOfInitialRequest.bodyAsJson;
 
     switch (this.response.status) {
       case 202:
@@ -145,11 +130,13 @@ export default class PollingState {
    * @returns {msRest.HttpOperationResponse} HttpOperationResponse
    */
   getOperationResponse(): msRest.HttpOperationResponse {
-    let result = new msRest.HttpOperationResponse(this.request, this.response);
+    let result = new msRest.HttpOperationResponse(this.request, this.response, this.response.body);
     if (this.resource && typeof this.resource.valueOf() === 'string') {
-      result.body = this.resource;
+      result.bodyAsText = this.resource;
+      result.bodyAsJson = JSON.parse(this.resource);
     } else {
-      result.body = JSON.stringify(this.resource);
+      result.bodyAsJson = this.resource;
+      result.bodyAsText = JSON.stringify(this.resource);
     }
     return result;
   }
@@ -166,19 +153,8 @@ export default class PollingState {
     let error = new msRest.RestError('');
     error.request = msRest.stripRequest(this.request);
     error.response = this.response;
-    let responseBody: string | null = this.resultOfInitialRequest.body as string;
-    let parsedResponse: any = null;
-    try {
-      if (responseBody !== null && responseBody !== undefined) {
-        if (responseBody === '') responseBody = null;
-        parsedResponse = JSON.parse(responseBody as string);
-      }
-    } catch (parseErr) {
-      error.message = `Error "${parseErr.message}" occurred while deserializing the error ` +
-        `message "${this.response.body}" for long running operation.`;
-      return error;
-    }
-
+    let parsedResponse = this.resultOfInitialRequest.bodyAsJson as { [key: string]: any };
+    
     if (err && err.message) {
       errMsg = `Long running operation failed with error: "${err.message}".`;
     } else {

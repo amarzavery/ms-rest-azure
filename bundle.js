@@ -380,27 +380,27 @@ const webResource_1 = __webpack_require__(4);
 exports.WebResource = webResource_1.WebResource;
 const httpOperationResponse_1 = __webpack_require__(8);
 exports.HttpOperationResponse = httpOperationResponse_1.HttpOperationResponse;
-const restError_1 = __webpack_require__(20);
+const restError_1 = __webpack_require__(9);
 exports.RestError = restError_1.RestError;
-const serviceClient_1 = __webpack_require__(21);
+const serviceClient_1 = __webpack_require__(20);
 exports.ServiceClient = serviceClient_1.ServiceClient;
 const constants_1 = __webpack_require__(1);
 exports.Constants = constants_1.Constants;
-const requestPipeline_1 = __webpack_require__(9);
+const requestPipeline_1 = __webpack_require__(10);
 exports.RequestPipeline = requestPipeline_1.RequestPipeline;
-const logFilter_1 = __webpack_require__(26);
+const logFilter_1 = __webpack_require__(25);
 exports.LogFilter = logFilter_1.LogFilter;
 const baseFilter_1 = __webpack_require__(2);
 exports.BaseFilter = baseFilter_1.BaseFilter;
-const exponentialRetryPolicyFilter_1 = __webpack_require__(10);
+const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
 exports.ExponentialRetryPolicyFilter = exponentialRetryPolicyFilter_1.ExponentialRetryPolicyFilter;
-const systemErrorRetryPolicyFilter_1 = __webpack_require__(11);
+const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
 exports.SystemErrorRetryPolicyFilter = systemErrorRetryPolicyFilter_1.SystemErrorRetryPolicyFilter;
-const signingFilter_1 = __webpack_require__(12);
+const signingFilter_1 = __webpack_require__(13);
 exports.SigningFilter = signingFilter_1.SigningFilter;
-const msRestUserAgentFilter_1 = __webpack_require__(13);
+const msRestUserAgentFilter_1 = __webpack_require__(14);
 exports.MsRestUserAgentFilter = msRestUserAgentFilter_1.MsRestUserAgentFilter;
-const serializer_1 = __webpack_require__(27);
+const serializer_1 = __webpack_require__(26);
 exports.MapperType = serializer_1.MapperType;
 exports.Serializer = serializer_1.Serializer;
 exports.serializeObject = serializer_1.serializeObject;
@@ -753,7 +753,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @constructor
  */
 class HttpOperationResponse {
-    constructor(request, response) {
+    constructor(request, response, body) {
         /**
          * Reference to the original request object.
          * [WebResource] object.
@@ -770,7 +770,9 @@ class HttpOperationResponse {
          * The response object.
          * @type {object}
          */
-        this.body = null;
+        this.bodyAsStream = body;
+        this.bodyAsText = null;
+        this.bodyAsJson = null;
     }
 }
 exports.HttpOperationResponse = HttpOperationResponse;
@@ -778,6 +780,28 @@ exports.HttpOperationResponse = HttpOperationResponse;
 
 /***/ }),
 /* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information. 
+Object.defineProperty(exports, "__esModule", { value: true });
+class RestError extends Error {
+    constructor(message, code, statusCode, request, response, body) {
+        super(message);
+        this.code = code;
+        this.statusCode = statusCode;
+        this.request = request;
+        this.response = response;
+        this.body = body;
+    }
+}
+exports.RestError = RestError;
+//# sourceMappingURL=restError.js.map
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -794,9 +818,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const httpOperationResponse_1 = __webpack_require__(8);
+const restError_1 = __webpack_require__(9);
 const utils = __webpack_require__(0);
-const FormData = __webpack_require__(22);
-const fPF = __webpack_require__(23)();
+const FormData = __webpack_require__(21);
+const fPF = __webpack_require__(22)();
 class RequestPipeline {
     constructor(filters, requestOptions) {
         this.filters = filters || [];
@@ -828,11 +853,12 @@ class RequestPipeline {
         else {
             pipeline.push(self.requestSink.bind(self));
         }
-        return (request) => {
+        let requestFun = (request) => {
             if (!request.headers)
                 request.headers = {};
             return utils.executePromisesSequentially(pipeline, request);
         };
+        return requestFun;
     }
     requestSink(options) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -873,14 +899,30 @@ class RequestPipeline {
             catch (err) {
                 throw err;
             }
-            const operationResponse = new httpOperationResponse_1.HttpOperationResponse(options, res);
-            if (options.rawResponse) {
-                operationResponse.body = res.body;
+            const operationResponse = new httpOperationResponse_1.HttpOperationResponse(options, res, res.body);
+            if (!options.rawResponse) {
+                try {
+                    operationResponse.bodyAsText = yield res.text();
+                }
+                catch (err) {
+                    let msg = `Error "${err}" occured while converting the raw response body into string.`;
+                    let errCode = err.code || 'RAWTEXT_CONVERSION_ERROR';
+                    let e = new restError_1.RestError(msg, errCode, res.status, options, res, res.body);
+                    return Promise.reject(e);
+                }
+                try {
+                    if (operationResponse.bodyAsText) {
+                        operationResponse.bodyAsJson = JSON.parse(operationResponse.bodyAsText);
+                    }
+                }
+                catch (err) {
+                    let msg = `Error "${err}" occured while executing JSON.parse on the response body - ${operationResponse.bodyAsText}.`;
+                    let errCode = err.code || 'JSON_PARSE_ERROR';
+                    let e = new restError_1.RestError(msg, errCode, res.status, options, res, operationResponse.bodyAsText);
+                    return Promise.reject(e);
+                }
             }
-            else {
-                operationResponse.body = yield res.text();
-            }
-            return operationResponse;
+            return Promise.resolve(operationResponse);
         });
     }
 }
@@ -888,7 +930,7 @@ exports.RequestPipeline = RequestPipeline;
 //# sourceMappingURL=requestPipeline.js.map
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -996,7 +1038,7 @@ exports.ExponentialRetryPolicyFilter = ExponentialRetryPolicyFilter;
 //# sourceMappingURL=exponentialRetryPolicyFilter.js.map
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1102,7 +1144,7 @@ exports.SystemErrorRetryPolicyFilter = SystemErrorRetryPolicyFilter;
 //# sourceMappingURL=systemErrorRetryPolicyFilter.js.map
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1125,7 +1167,7 @@ exports.SigningFilter = SigningFilter;
 //# sourceMappingURL=signingFilter.js.map
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1135,7 +1177,7 @@ exports.SigningFilter = SigningFilter;
 Object.defineProperty(exports, "__esModule", { value: true });
 const baseFilter_1 = __webpack_require__(2);
 const constants_1 = __webpack_require__(1);
-const os = __webpack_require__(25);
+const os = __webpack_require__(24);
 const HeaderConstants = constants_1.Constants.HeaderConstants;
 class MsRestUserAgentFilter extends baseFilter_1.BaseFilter {
     constructor(userAgentInfo) {
@@ -1178,35 +1220,7 @@ class MsRestUserAgentFilter extends baseFilter_1.BaseFilter {
 }
 exports.MsRestUserAgentFilter = MsRestUserAgentFilter;
 //# sourceMappingURL=msRestUserAgentFilter.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isStream = module.exports = function (stream) {
-	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
-};
-
-isStream.writable = function (stream) {
-	return isStream(stream) && stream.writable !== false && typeof stream._write === 'function' && typeof stream._writableState === 'object';
-};
-
-isStream.readable = function (stream) {
-	return isStream(stream) && stream.readable !== false && typeof stream._read === 'function' && typeof stream._readableState === 'object';
-};
-
-isStream.duplex = function (stream) {
-	return isStream.writable(stream) && isStream.readable(stream);
-};
-
-isStream.transform = function (stream) {
-	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
-};
-
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23)))
 
 /***/ }),
 /* 15 */
@@ -1479,28 +1493,6 @@ module.exports = v4;
 "use strict";
 
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information. 
-Object.defineProperty(exports, "__esModule", { value: true });
-class RestError extends Error {
-    constructor(message, code, statusCode, request, response, body) {
-        super(message);
-        this.code = code;
-        this.statusCode = statusCode;
-        this.request = request;
-        this.response = response;
-        this.body = body;
-    }
-}
-exports.RestError = RestError;
-//# sourceMappingURL=restError.js.map
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1511,11 +1503,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestPipeline_1 = __webpack_require__(9);
-const exponentialRetryPolicyFilter_1 = __webpack_require__(10);
-const systemErrorRetryPolicyFilter_1 = __webpack_require__(11);
-const signingFilter_1 = __webpack_require__(12);
-const msRestUserAgentFilter_1 = __webpack_require__(13);
+const requestPipeline_1 = __webpack_require__(10);
+const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
+const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
+const signingFilter_1 = __webpack_require__(13);
+const msRestUserAgentFilter_1 = __webpack_require__(14);
 const webResource_1 = __webpack_require__(4);
 const constants_1 = __webpack_require__(1);
 /**
@@ -1605,7 +1597,7 @@ exports.ServiceClient = ServiceClient;
 //# sourceMappingURL=serviceClient.js.map
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports) {
 
 /* eslint-env browser */
@@ -1613,7 +1605,7 @@ module.exports = typeof self == 'object' ? self.FormData : window.FormData;
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
@@ -2119,7 +2111,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2309,7 +2301,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports) {
 
 exports.endianness = function () { return 'LE' };
@@ -2360,7 +2352,7 @@ exports.EOL = '\n';
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2369,7 +2361,6 @@ exports.EOL = '\n';
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
 const baseFilter_1 = __webpack_require__(2);
-const isStream = __webpack_require__(14);
 class LogFilter extends baseFilter_1.BaseFilter {
     constructor(logger = console.log) {
         super();
@@ -2379,10 +2370,7 @@ class LogFilter extends baseFilter_1.BaseFilter {
         const self = this;
         self.logger(`>> Request: ${JSON.stringify(operationResponse.request, undefined, 2)}`);
         self.logger(`>> Response status code: ${operationResponse.response.status}`);
-        let responseBody = operationResponse.body;
-        if (isStream(operationResponse.body)) {
-            responseBody = 'The response body is a stream. Hence omitting it from logging.';
-        }
+        let responseBody = operationResponse.bodyAsText;
         self.logger(`>> Body: ${responseBody}`);
         return Promise.resolve(operationResponse);
     }
@@ -2391,7 +2379,7 @@ exports.LogFilter = LogFilter;
 //# sourceMappingURL=logFilter.js.map
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2400,9 +2388,9 @@ exports.LogFilter = LogFilter;
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils = __webpack_require__(0);
-const moment_1 = __webpack_require__(28);
-const isBuffer = __webpack_require__(30);
-const isStream = __webpack_require__(14);
+const moment_1 = __webpack_require__(27);
+const isBuffer = __webpack_require__(29);
+const isStream = __webpack_require__(30);
 class Serializer {
     constructor(models) {
         this.models = models;
@@ -3100,7 +3088,7 @@ exports.MapperType = utils.strEnum([
 //# sourceMappingURL=serializer.js.map
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {//! moment.js
@@ -7567,10 +7555,10 @@ return hooks;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(29)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)(module)))
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -7598,7 +7586,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports) {
 
 /*!
@@ -7622,6 +7610,34 @@ function isBuffer (obj) {
 function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isStream = module.exports = function (stream) {
+	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
+};
+
+isStream.writable = function (stream) {
+	return isStream(stream) && stream.writable !== false && typeof stream._write === 'function' && typeof stream._writableState === 'object';
+};
+
+isStream.readable = function (stream) {
+	return isStream(stream) && stream.readable !== false && typeof stream._read === 'function' && typeof stream._readableState === 'object';
+};
+
+isStream.duplex = function (stream) {
+	return isStream.writable(stream) && isStream.readable(stream);
+};
+
+isStream.transform = function (stream) {
+	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
+};
 
 
 /***/ }),
@@ -7910,18 +7926,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             catch (err) {
                 return Promise.reject(err);
             }
-            let responseBody = result.body;
-            if (responseBody === '')
-                responseBody = null;
-            let parsedResponse;
-            try {
-                parsedResponse = JSON.parse(responseBody);
-            }
-            catch (err) {
-                let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-                    `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`);
-                return Promise.reject(e);
-            }
+            let parsedResponse = result.bodyAsJson;
             if (!parsedResponse || !parsedResponse.status) {
                 return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
             }
@@ -7931,7 +7936,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             pollingState.request = result.request;
             pollingState.resource = null;
             if (inPostOrDelete) {
-                pollingState.resource = result.body;
+                pollingState.resource = result.bodyAsJson;
             }
             return Promise.resolve();
         });
@@ -7950,18 +7955,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             catch (err) {
                 return Promise.reject(err);
             }
-            let responseBody = result.body;
-            if (responseBody === '')
-                responseBody = null;
-            let parsedResponse = null;
-            try {
-                parsedResponse = JSON.parse(responseBody);
-            }
-            catch (err) {
-                let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-                    `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`);
-                return Promise.reject(e);
-            }
+            let parsedResponse = result.bodyAsJson;
             pollingState.updateResponse(result.response);
             pollingState.request = result.request;
             let statusCode = result.response.status;
@@ -7997,19 +7991,11 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             catch (err) {
                 return Promise.reject(err);
             }
-            let responseBody = result.body;
-            if (responseBody === '')
-                responseBody = null;
-            let parsedResponse;
-            try {
-                parsedResponse = JSON.parse(responseBody);
+            let parsedResponse = result.bodyAsJson;
+            pollingState.status = LroStates.Succeeded;
+            if (parsedResponse && parsedResponse.properties && parsedResponse.properties.provisioningState) {
+                pollingState.status = parsedResponse.properties.provisioningState;
             }
-            catch (err) {
-                let e = new Error(`An error "${err}" occurred in deserializing the response body "${responseBody}" ` +
-                    `after getting status from azure-asyncoperation header: "${pollingState.azureAsyncOperationHeaderLink}".`);
-                return Promise.reject(e);
-            }
-            pollingState.status = parsedResponse.properties.provisioningState || LroStates.Succeeded;
             pollingState.updateResponse(result.response);
             pollingState.request = result.request;
             pollingState.resource = parsedResponse;
@@ -8051,9 +8037,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
                 return Promise.reject(err);
             }
             let statusCode = operationResponse.response.status;
-            let responseBody = operationResponse.body;
-            if (responseBody === '')
-                responseBody = null;
+            let responseBody = operationResponse.bodyAsJson;
             if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
                 let error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
                     `when polling for operation status.`);
@@ -8061,11 +8045,11 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
                 error.request = __WEBPACK_IMPORTED_MODULE_0_ms_rest__["stripRequest"](operationResponse.request);
                 error.response = operationResponse.response;
                 try {
-                    error.body = JSON.parse(responseBody);
+                    error.body = responseBody;
                 }
                 catch (badResponse) {
-                    error.message += ` Error "${badResponse}" occured while deserializing the response body - "${responseBody}".`;
-                    error.body = responseBody;
+                    error.message += ` Error "${badResponse}" occured while deserializing the response body - "${operationResponse.bodyAsText}".`;
+                    error.body = operationResponse.bodyAsText;
                 }
                 return Promise.reject(error);
             }
@@ -8104,24 +8088,7 @@ class PollingState {
         this.retryTimeout = retryTimeout;
         this.updateResponse(resultOfInitialRequest.response);
         this.request = resultOfInitialRequest.request;
-        //Parse response.body & assign it as the resource
-        try {
-            if (resultOfInitialRequest.body &&
-                typeof resultOfInitialRequest.body.valueOf() === 'string' &&
-                resultOfInitialRequest.body.length > 0) {
-                this.resource = JSON.parse(resultOfInitialRequest.body);
-            }
-            else {
-                this.resource = resultOfInitialRequest.body;
-            }
-        }
-        catch (error) {
-            let deserializationError = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["RestError"](`Error "${error}" occurred in parsing the responseBody ' +
-        'while creating the PollingState for Long Running Operation- "${resultOfInitialRequest.body}"`);
-            deserializationError.request = resultOfInitialRequest.request;
-            deserializationError.response = resultOfInitialRequest.response;
-            throw deserializationError;
-        }
+        this.resource = resultOfInitialRequest.bodyAsJson;
         switch (this.response.status) {
             case 202:
                 this.status = LroStates.InProgress;
@@ -8188,12 +8155,14 @@ class PollingState {
      * @returns {msRest.HttpOperationResponse} HttpOperationResponse
      */
     getOperationResponse() {
-        let result = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["HttpOperationResponse"](this.request, this.response);
+        let result = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["HttpOperationResponse"](this.request, this.response, this.response.body);
         if (this.resource && typeof this.resource.valueOf() === 'string') {
-            result.body = this.resource;
+            result.bodyAsText = this.resource;
+            result.bodyAsJson = JSON.parse(this.resource);
         }
         else {
-            result.body = JSON.stringify(this.resource);
+            result.bodyAsJson = this.resource;
+            result.bodyAsText = JSON.stringify(this.resource);
         }
         return result;
     }
@@ -8208,20 +8177,7 @@ class PollingState {
         let error = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["RestError"]('');
         error.request = __WEBPACK_IMPORTED_MODULE_1_ms_rest__["stripRequest"](this.request);
         error.response = this.response;
-        let responseBody = this.resultOfInitialRequest.body;
-        let parsedResponse = null;
-        try {
-            if (responseBody !== null && responseBody !== undefined) {
-                if (responseBody === '')
-                    responseBody = null;
-                parsedResponse = JSON.parse(responseBody);
-            }
-        }
-        catch (parseErr) {
-            error.message = `Error "${parseErr.message}" occurred while deserializing the error ` +
-                `message "${this.response.body}" for long running operation.`;
-            return error;
-        }
+        let parsedResponse = this.resultOfInitialRequest.bodyAsJson;
         if (err && err.message) {
             errMsg = `Long running operation failed with error: "${err.message}".`;
         }
