@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
-  entry: './sample.ts',
+  entry: './lib/msRestAzure.ts',
   devtool: 'source-map',
   output: {
     filename: 'bundle.js',

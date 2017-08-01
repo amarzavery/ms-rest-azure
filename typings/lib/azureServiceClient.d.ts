@@ -1,5 +1,4 @@
 import * as msRest from 'ms-rest';
-import PollingState from './pollingState';
 /**
  * Options to be provided while creating the client.
  */
@@ -50,36 +49,36 @@ export declare class AzureServiceClient extends msRest.ServiceClient {
      * Verified whether an unexpected polling status code for long running operation was received for the response of the initial request.
      * @param {msRest.HttpOperationResponse} initialResponse - Response to the initial request that was sent as a part of the asynchronous operation.
      */
-    checkResponseStatusCodeFailed(initialResponse: msRest.HttpOperationResponse): boolean;
+    private checkResponseStatusCodeFailed(initialResponse);
     /**
      * Poll Azure long running PUT, PATCH, POST or DELETE operations.
      * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
      * @param {msRest.RequestOptions} [options] - custom request options.
      * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
      */
-    getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse>;
+    private getLongRunningOperationResult(resultOfInitialRequest, options?);
     /**
      * Retrieve operation status by polling from 'azure-asyncoperation' header.
      * @param {PollingState} pollingState - The object to persist current operation state.
      * @param {boolean} inPostOrDelete - Invoked by Post Or Delete operation.
      */
-    updateStateFromAzureAsyncOperationHeader(pollingState: PollingState, inPostOrDelete?: boolean): Promise<void>;
+    private updateStateFromAzureAsyncOperationHeader(pollingState, inPostOrDelete?);
     /**
      * Retrieve PUT operation status by polling from 'location' header.
      * @param {string} method - The HTTP method.
      * @param {PollingState} pollingState - The object to persist current operation state.
      */
-    updateStateFromLocationHeader(method: string, pollingState: PollingState): Promise<void>;
+    private updateStateFromLocationHeader(method, pollingState);
     /**
      * Polling for resource status.
      * @param {string} resourceUrl - The url of resource.
      * @param {PollingState} pollingState - The object to persist current operation state.
      */
-    updateStateFromGetResourceOperation(resourceUrl: string, pollingState: PollingState): Promise<void>;
+    private updateStateFromGetResourceOperation(resourceUrl, pollingState);
     /**
      * Retrieves operation status by querying the operation URL.
      * @param {string} operationUrl - URL used to poll operation result.
      * @param {object} options - Options that can be set on the request object
      */
-    getStatus(operationUrl: string, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse>;
+    private getStatus(operationUrl, options?);
 }

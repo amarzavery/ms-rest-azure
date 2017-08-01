@@ -108,7 +108,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * Verified whether an unexpected polling status code for long running operation was received for the response of the initial request.
    * @param {msRest.HttpOperationResponse} initialResponse - Response to the initial request that was sent as a part of the asynchronous operation.
    */
-  checkResponseStatusCodeFailed(initialResponse: msRest.HttpOperationResponse): boolean {
+  private checkResponseStatusCodeFailed(initialResponse: msRest.HttpOperationResponse): boolean {
     let statusCode = initialResponse.response.status;
     let method = initialResponse.request.method;
     if (statusCode === 200 || statusCode === 202 ||
@@ -127,7 +127,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {msRest.RequestOptions} [options] - custom request options.
    * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
    */
-  async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
+  private async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
     let self = this;
     let initialRequestMethod: string = resultOfInitialRequest.request.method as msRest.HttpMethods;
 
@@ -174,7 +174,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {PollingState} pollingState - The object to persist current operation state.
    * @param {boolean} inPostOrDelete - Invoked by Post Or Delete operation.
    */
-  async updateStateFromAzureAsyncOperationHeader(pollingState: PollingState, inPostOrDelete: boolean = false): Promise<void> {
+  private async updateStateFromAzureAsyncOperationHeader(pollingState: PollingState, inPostOrDelete: boolean = false): Promise<void> {
     let result: msRest.HttpOperationResponse;
 
     try {
@@ -204,7 +204,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {string} method - The HTTP method.
    * @param {PollingState} pollingState - The object to persist current operation state.
    */
-  async updateStateFromLocationHeader(method: string, pollingState: PollingState): Promise<void> {
+  private async updateStateFromLocationHeader(method: string, pollingState: PollingState): Promise<void> {
     let result: msRest.HttpOperationResponse;
     try {
       result = await this.getStatus(pollingState.locationHeaderLink as string, pollingState.optionsOfInitialRequest);
@@ -237,7 +237,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {string} resourceUrl - The url of resource.
    * @param {PollingState} pollingState - The object to persist current operation state.
    */
-  async updateStateFromGetResourceOperation(resourceUrl: string, pollingState: PollingState): Promise<void> {
+  private async updateStateFromGetResourceOperation(resourceUrl: string, pollingState: PollingState): Promise<void> {
     let result: msRest.HttpOperationResponse;
     try {
       result = await this.getStatus(resourceUrl, pollingState.optionsOfInitialRequest);
@@ -264,7 +264,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {string} operationUrl - URL used to poll operation result.
    * @param {object} options - Options that can be set on the request object
    */
-  async getStatus(operationUrl: string, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
+  private async getStatus(operationUrl: string, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
     let self = this;
     // Construct URL
     let requestUrl = operationUrl.replace(' ', '%20');

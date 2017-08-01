@@ -73,9 +73,9 @@ var className =
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const webResource_1 = __webpack_require__(4);
+const webResource_1 = __webpack_require__(3);
 const constants_1 = __webpack_require__(1);
-const uuid = __webpack_require__(16);
+const uuid = __webpack_require__(17);
 /**
  * Checks if a parsed URL is HTTPS
  *
@@ -376,57 +376,6 @@ exports.BaseFilter = BaseFilter;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const webResource_1 = __webpack_require__(4);
-exports.WebResource = webResource_1.WebResource;
-const httpOperationResponse_1 = __webpack_require__(8);
-exports.HttpOperationResponse = httpOperationResponse_1.HttpOperationResponse;
-const restError_1 = __webpack_require__(9);
-exports.RestError = restError_1.RestError;
-const serviceClient_1 = __webpack_require__(20);
-exports.ServiceClient = serviceClient_1.ServiceClient;
-const constants_1 = __webpack_require__(1);
-exports.Constants = constants_1.Constants;
-const requestPipeline_1 = __webpack_require__(10);
-exports.RequestPipeline = requestPipeline_1.RequestPipeline;
-const logFilter_1 = __webpack_require__(25);
-exports.LogFilter = logFilter_1.LogFilter;
-const baseFilter_1 = __webpack_require__(2);
-exports.BaseFilter = baseFilter_1.BaseFilter;
-const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
-exports.ExponentialRetryPolicyFilter = exponentialRetryPolicyFilter_1.ExponentialRetryPolicyFilter;
-const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
-exports.SystemErrorRetryPolicyFilter = systemErrorRetryPolicyFilter_1.SystemErrorRetryPolicyFilter;
-const signingFilter_1 = __webpack_require__(13);
-exports.SigningFilter = signingFilter_1.SigningFilter;
-const msRestUserAgentFilter_1 = __webpack_require__(14);
-exports.MsRestUserAgentFilter = msRestUserAgentFilter_1.MsRestUserAgentFilter;
-const serializer_1 = __webpack_require__(26);
-exports.MapperType = serializer_1.MapperType;
-exports.Serializer = serializer_1.Serializer;
-exports.serializeObject = serializer_1.serializeObject;
-const utils_1 = __webpack_require__(0);
-exports.stripRequest = utils_1.stripRequest;
-exports.stripResponse = utils_1.stripResponse;
-exports.delay = utils_1.delay;
-exports.executePromisesSequentially = utils_1.executePromisesSequentially;
-exports.generateUuid = utils_1.generateUuid;
-exports.encodeUri = utils_1.encodeUri;
-// Credentials
-const tokenCredentials_1 = __webpack_require__(31);
-exports.TokenCredentials = tokenCredentials_1.TokenCredentials;
-const basicAuthenticationCredentials_1 = __webpack_require__(32);
-exports.BasicAuthenticationCredentials = basicAuthenticationCredentials_1.BasicAuthenticationCredentials;
-//# sourceMappingURL=msRest.js.map
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = __webpack_require__(0);
 /**
  * Creates a new WebResource object.
@@ -631,7 +580,7 @@ exports.WebResource = WebResource;
 //# sourceMappingURL=webResource.js.map
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -666,6 +615,57 @@ const Constants = {
 };
 /* harmony default export */ __webpack_exports__["a"] = (Constants);
 
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+Object.defineProperty(exports, "__esModule", { value: true });
+const webResource_1 = __webpack_require__(3);
+exports.WebResource = webResource_1.WebResource;
+const httpOperationResponse_1 = __webpack_require__(8);
+exports.HttpOperationResponse = httpOperationResponse_1.HttpOperationResponse;
+const restError_1 = __webpack_require__(9);
+exports.RestError = restError_1.RestError;
+const serviceClient_1 = __webpack_require__(21);
+exports.ServiceClient = serviceClient_1.ServiceClient;
+const constants_1 = __webpack_require__(1);
+exports.Constants = constants_1.Constants;
+const requestPipeline_1 = __webpack_require__(10);
+exports.RequestPipeline = requestPipeline_1.RequestPipeline;
+const logFilter_1 = __webpack_require__(26);
+exports.LogFilter = logFilter_1.LogFilter;
+const baseFilter_1 = __webpack_require__(2);
+exports.BaseFilter = baseFilter_1.BaseFilter;
+const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
+exports.ExponentialRetryPolicyFilter = exponentialRetryPolicyFilter_1.ExponentialRetryPolicyFilter;
+const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
+exports.SystemErrorRetryPolicyFilter = systemErrorRetryPolicyFilter_1.SystemErrorRetryPolicyFilter;
+const signingFilter_1 = __webpack_require__(13);
+exports.SigningFilter = signingFilter_1.SigningFilter;
+const msRestUserAgentFilter_1 = __webpack_require__(14);
+exports.MsRestUserAgentFilter = msRestUserAgentFilter_1.MsRestUserAgentFilter;
+const serializer_1 = __webpack_require__(27);
+exports.MapperType = serializer_1.MapperType;
+exports.Serializer = serializer_1.Serializer;
+exports.serializeObject = serializer_1.serializeObject;
+const utils_1 = __webpack_require__(0);
+exports.stripRequest = utils_1.stripRequest;
+exports.stripResponse = utils_1.stripResponse;
+exports.delay = utils_1.delay;
+exports.executePromisesSequentially = utils_1.executePromisesSequentially;
+exports.generateUuid = utils_1.generateUuid;
+exports.encodeUri = utils_1.encodeUri;
+// Credentials
+const tokenCredentials_1 = __webpack_require__(32);
+exports.TokenCredentials = tokenCredentials_1.TokenCredentials;
+const basicAuthenticationCredentials_1 = __webpack_require__(33);
+exports.BasicAuthenticationCredentials = basicAuthenticationCredentials_1.BasicAuthenticationCredentials;
+//# sourceMappingURL=msRest.js.map
 
 /***/ }),
 /* 6 */
@@ -705,7 +705,7 @@ if (!rng) {
 
 module.exports = rng;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
 
 /***/ }),
 /* 7 */
@@ -820,8 +820,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const httpOperationResponse_1 = __webpack_require__(8);
 const restError_1 = __webpack_require__(9);
 const utils = __webpack_require__(0);
-const FormData = __webpack_require__(21);
-const fPF = __webpack_require__(22)();
+const FormData = __webpack_require__(22);
+const fPF = __webpack_require__(23)();
 class RequestPipeline {
     constructor(filters, requestOptions) {
         this.filters = filters || [];
@@ -1177,7 +1177,7 @@ exports.SigningFilter = SigningFilter;
 Object.defineProperty(exports, "__esModule", { value: true });
 const baseFilter_1 = __webpack_require__(2);
 const constants_1 = __webpack_require__(1);
-const os = __webpack_require__(24);
+const os = __webpack_require__(25);
 const HeaderConstants = constants_1.Constants.HeaderConstants;
 class MsRestUserAgentFilter extends baseFilter_1.BaseFilter {
     constructor(userAgentInfo) {
@@ -1220,7 +1220,7 @@ class MsRestUserAgentFilter extends baseFilter_1.BaseFilter {
 }
 exports.MsRestUserAgentFilter = MsRestUserAgentFilter;
 //# sourceMappingURL=msRestUserAgentFilter.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
 
 /***/ }),
 /* 15 */
@@ -1228,10 +1228,28 @@ exports.MsRestUserAgentFilter = MsRestUserAgentFilter;
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_ms_rest__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_msRestAzure__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(4);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AzureServiceClient", function() { return __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Constants", function() { return __WEBPACK_IMPORTED_MODULE_1__util_constants__["a"]; });
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
 
+
+
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_ms_rest__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pollingState__ = __webpack_require__(34);
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information. 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -1242,74 +1260,301 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 
 
-const clientOptions = {
-    filters: [new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["LogFilter"]()]
-};
-const subscriptionId = '00977cdb-163f-435f-9c32-39ec8ae61f4d';
-const resourceGroupName = 'foozap002';
-const accountName = 'foozy894';
-const location = 'westus';
-const apiVersion = '2017-06-01';
-// An easy way to get the token
-// 1. Go to this test drive link https://azure.github.io/projects/apis and authenticate by clicking on Authorize. Check the user impersoantion checkbox in the popup.
-// 1.1 select a subscription of your choice
-// 1.2 select the storage-2015-06-15 option from the first drop down list
-// 1.3 expand the url to list storage accounts in a subscription
-// 1.4 click on try it out button.
-// 1.5 in the curl tab you will see the actual curl request that has the bearer token in it
-// 1.6 copy paste that token here. That token is valid for 1 hour
-const token = 'your-token';
-const creds = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["TokenCredentials"](token);
-const client = new __WEBPACK_IMPORTED_MODULE_1__lib_msRestAzure__["a" /* AzureServiceClient */](creds, clientOptions);
-const req = {
-    url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Storage/storageAccounts/${accountName}?api-version=${apiVersion}`,
-    method: 'PUT',
-    body: {
-        location: location,
-        sku: {
-            name: "Standard_GRS"
-        },
-        kind: "Storage",
-        tags: {
-            key1: "value1",
-            key2: "value2"
+
+const LroStates = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].LongRunningOperationStates;
+/**
+ * @class
+ * Initializes a new instance of the AzureServiceClient class.
+ * @constructor
+ *
+ * @param {msRest.ServiceClientCredentilas} credentials - ApplicationTokenCredentials or
+ * UserTokenCredentials object used for authentication.
+ * @param {AzureServiceClientOptions} options - The parameter options used by AzureServiceClient
+ */
+class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceClient"] {
+    constructor(credentials, options) {
+        super(credentials, options);
+        this.acceptLanguage = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].DEFAULT_LANGUAGE;
+        this.generateClientRequestId = true;
+        this.longRunningOperationRetryTimeout = 30;
+        this.rpRegistrationRetryTimeout = 30;
+        this.acceptLanguage = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].DEFAULT_LANGUAGE;
+        this.generateClientRequestId = true;
+        this.longRunningOperationRetryTimeout = 30;
+        if (!options)
+            options = {};
+        if (options.acceptLanguage !== null && options.acceptLanguage !== undefined) {
+            this.acceptLanguage = options.acceptLanguage;
         }
-    }
-};
-function execute(req) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let res;
+        if (options.generateClientRequestId !== null && options.generateClientRequestId !== undefined) {
+            this.generateClientRequestId = options.generateClientRequestId;
+        }
+        if (options.longRunningOperationRetryTimeout !== null && options.longRunningOperationRetryTimeout !== undefined) {
+            this.longRunningOperationRetryTimeout = options.longRunningOperationRetryTimeout;
+        }
+        if (options.rpRegistrationRetryTimeout !== null && options.rpRegistrationRetryTimeout !== undefined) {
+            this.rpRegistrationRetryTimeout = options.rpRegistrationRetryTimeout;
+        }
         try {
-            res = yield client.sendLongRunningRequest(req);
-            console.dir(res);
-            document.write(JSON.stringify(res));
-            return Promise.resolve(res);
+            const moduleName = 'ms-rest-azure';
+            const moduleVersion = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].msRestAzureVersion;
+            this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
         }
         catch (err) {
-            return Promise.reject(err);
+            // do nothing
         }
-    });
+    }
+    /**
+     * Provides a mechanism to make a request that will poll and provide the final result.
+     * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
+     * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
+     * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
+     */
+    sendLongRunningRequest(request, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let self = this;
+            let initialResponse;
+            try {
+                initialResponse = yield self.sendRequest(request);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            let finalResponse;
+            try {
+                finalResponse = yield self.getLongRunningOperationResult(initialResponse, options);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            return Promise.resolve(finalResponse);
+        });
+    }
+    /**
+     * Verified whether an unexpected polling status code for long running operation was received for the response of the initial request.
+     * @param {msRest.HttpOperationResponse} initialResponse - Response to the initial request that was sent as a part of the asynchronous operation.
+     */
+    checkResponseStatusCodeFailed(initialResponse) {
+        let statusCode = initialResponse.response.status;
+        let method = initialResponse.request.method;
+        if (statusCode === 200 || statusCode === 202 ||
+            (statusCode === 201 && method === 'PUT') ||
+            (statusCode === 204 && (method === 'DELETE' || method === 'POST'))) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    //goal is to get this working without using the async package and simply using async and Promise.
+    /**
+     * Poll Azure long running PUT, PATCH, POST or DELETE operations.
+     * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
+     * @param {msRest.RequestOptions} [options] - custom request options.
+     * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
+     */
+    getLongRunningOperationResult(resultOfInitialRequest, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let self = this;
+            let initialRequestMethod = resultOfInitialRequest.request.method;
+            if (self.checkResponseStatusCodeFailed(resultOfInitialRequest)) {
+                return Promise.reject(`Unexpected polling status code from long running operation ` +
+                    `"${resultOfInitialRequest.response.status}" for method "${initialRequestMethod}".`);
+            }
+            let pollingState;
+            try {
+                pollingState = new __WEBPACK_IMPORTED_MODULE_2__pollingState__["a" /* default */](resultOfInitialRequest, self.longRunningOperationRetryTimeout);
+                pollingState.optionsOfInitialRequest = options;
+            }
+            catch (error) {
+                return Promise.reject(error);
+            }
+            let resourceUrl = resultOfInitialRequest.request.url;
+            while (![LroStates.Succeeded, LroStates.Failed, LroStates.Canceled].some((e) => { return e === pollingState.status; })) {
+                yield __WEBPACK_IMPORTED_MODULE_0_ms_rest__["delay"](pollingState.getTimeout());
+                if (pollingState.azureAsyncOperationHeaderLink) {
+                    yield self.updateStateFromAzureAsyncOperationHeader(pollingState, true);
+                }
+                else if (pollingState.locationHeaderLink) {
+                    yield self.updateStateFromLocationHeader(initialRequestMethod, pollingState);
+                }
+                else if (initialRequestMethod === 'PUT') {
+                    yield self.updateStateFromGetResourceOperation(resourceUrl, pollingState);
+                }
+                else {
+                    return Promise.reject(new Error('Location header is missing from long running operation.'));
+                }
+            }
+            if (pollingState.status === LroStates.Succeeded) {
+                if ((pollingState.azureAsyncOperationHeaderLink || !pollingState.resource) &&
+                    (initialRequestMethod === 'PUT' || initialRequestMethod === 'PATCH')) {
+                    yield self.updateStateFromGetResourceOperation(resourceUrl, pollingState);
+                    return Promise.resolve(pollingState.getOperationResponse());
+                }
+                else {
+                    return Promise.resolve(pollingState.getOperationResponse());
+                }
+            }
+            else {
+                return Promise.reject(pollingState.getRestError());
+            }
+        });
+    }
+    /**
+     * Retrieve operation status by polling from 'azure-asyncoperation' header.
+     * @param {PollingState} pollingState - The object to persist current operation state.
+     * @param {boolean} inPostOrDelete - Invoked by Post Or Delete operation.
+     */
+    updateStateFromAzureAsyncOperationHeader(pollingState, inPostOrDelete = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result;
+            try {
+                result = yield this.getStatus(pollingState.azureAsyncOperationHeaderLink, pollingState.optionsOfInitialRequest);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            let parsedResponse = result.bodyAsJson;
+            if (!parsedResponse || !parsedResponse.status) {
+                return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
+            }
+            pollingState.status = parsedResponse.status;
+            pollingState.error = parsedResponse.error;
+            pollingState.updateResponse(result.response);
+            pollingState.request = result.request;
+            pollingState.resource = null;
+            if (inPostOrDelete) {
+                pollingState.resource = result.bodyAsJson;
+            }
+            return Promise.resolve();
+        });
+    }
+    /**
+     * Retrieve PUT operation status by polling from 'location' header.
+     * @param {string} method - The HTTP method.
+     * @param {PollingState} pollingState - The object to persist current operation state.
+     */
+    updateStateFromLocationHeader(method, pollingState) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result;
+            try {
+                result = yield this.getStatus(pollingState.locationHeaderLink, pollingState.optionsOfInitialRequest);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            let parsedResponse = result.bodyAsJson;
+            pollingState.updateResponse(result.response);
+            pollingState.request = result.request;
+            let statusCode = result.response.status;
+            if (statusCode === 202) {
+                pollingState.status = LroStates.InProgress;
+            }
+            else if (statusCode === 200 ||
+                (statusCode === 201 && method === 'PUT') ||
+                (statusCode === 204 && (method === 'DELETE' || method === 'POST'))) {
+                pollingState.status = LroStates.Succeeded;
+                pollingState.resource = parsedResponse;
+                //we might not throw an error, but initialize here just in case.
+                pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
+                pollingState.error.code = pollingState.status;
+            }
+            else {
+                return Promise.reject(new Error(`The response with status code ${statusCode} from polling for ` +
+                    `long running operation url "${pollingState.locationHeaderLink}" is not valid.`));
+            }
+        });
+    }
+    /**
+     * Polling for resource status.
+     * @param {string} resourceUrl - The url of resource.
+     * @param {PollingState} pollingState - The object to persist current operation state.
+     */
+    updateStateFromGetResourceOperation(resourceUrl, pollingState) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result;
+            try {
+                result = yield this.getStatus(resourceUrl, pollingState.optionsOfInitialRequest);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            let parsedResponse = result.bodyAsJson;
+            pollingState.status = LroStates.Succeeded;
+            if (parsedResponse && parsedResponse.properties && parsedResponse.properties.provisioningState) {
+                pollingState.status = parsedResponse.properties.provisioningState;
+            }
+            pollingState.updateResponse(result.response);
+            pollingState.request = result.request;
+            pollingState.resource = parsedResponse;
+            //we might not throw an error, but initialize here just in case.
+            pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
+            pollingState.error.code = pollingState.status;
+            return Promise.resolve();
+        });
+    }
+    /**
+     * Retrieves operation status by querying the operation URL.
+     * @param {string} operationUrl - URL used to poll operation result.
+     * @param {object} options - Options that can be set on the request object
+     */
+    getStatus(operationUrl, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let self = this;
+            // Construct URL
+            let requestUrl = operationUrl.replace(' ', '%20');
+            // Create HTTP request object
+            let httpRequest = {
+                method: 'GET',
+                url: requestUrl,
+                headers: {}
+            };
+            if (options) {
+                let customHeaders = options.customHeaders;
+                for (let headerName in customHeaders) {
+                    if (customHeaders.hasOwnProperty(headerName)) {
+                        httpRequest.headers[headerName] = customHeaders[headerName];
+                    }
+                }
+            }
+            let operationResponse;
+            try {
+                operationResponse = yield self.sendRequest(httpRequest);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            let statusCode = operationResponse.response.status;
+            let responseBody = operationResponse.bodyAsJson;
+            if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
+                let error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
+                    `when polling for operation status.`);
+                error.statusCode = statusCode;
+                error.request = __WEBPACK_IMPORTED_MODULE_0_ms_rest__["stripRequest"](operationResponse.request);
+                error.response = operationResponse.response;
+                try {
+                    error.body = responseBody;
+                }
+                catch (badResponse) {
+                    error.message += ` Error "${badResponse}" occured while deserializing the response body - "${operationResponse.bodyAsText}".`;
+                    error.body = operationResponse.bodyAsText;
+                }
+                return Promise.reject(error);
+            }
+            return Promise.resolve(operationResponse);
+        });
+    }
 }
-console.log("Hi There!!");
-// client.sendLongRunningRequest(req).then((res: msRest.HttpOperationResponse) => {
-//   console.log(res.body as string);
-// }).catch((err) => {
-//   console.dir(err);
-// });
-execute(req).catch((err) => { console.dir(err); });
-for (var i = 1; i <= 20; i++) {
-    console.log('Hello World ' + i);
-    setTimeout(function (x) { return function () { console.log(x); }; }(i), 1000 * i);
-    // 1 2 3 4 5
-}
+/* harmony export (immutable) */ __webpack_exports__["a"] = AzureServiceClient;
+
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var v1 = __webpack_require__(17);
-var v4 = __webpack_require__(19);
+var v1 = __webpack_require__(18);
+var v4 = __webpack_require__(20);
 
 var uuid = v4;
 uuid.v1 = v1;
@@ -1319,7 +1564,7 @@ module.exports = uuid;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var rng = __webpack_require__(6);
@@ -1425,7 +1670,7 @@ module.exports = v1;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1452,7 +1697,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var rng = __webpack_require__(6);
@@ -1487,7 +1732,7 @@ module.exports = v4;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1508,7 +1753,7 @@ const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
 const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
 const signingFilter_1 = __webpack_require__(13);
 const msRestUserAgentFilter_1 = __webpack_require__(14);
-const webResource_1 = __webpack_require__(4);
+const webResource_1 = __webpack_require__(3);
 const constants_1 = __webpack_require__(1);
 /**
  * @class
@@ -1597,7 +1842,7 @@ exports.ServiceClient = ServiceClient;
 //# sourceMappingURL=serviceClient.js.map
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 /* eslint-env browser */
@@ -1605,7 +1850,7 @@ module.exports = typeof self == 'object' ? self.FormData : window.FormData;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
@@ -2111,7 +2356,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2301,7 +2546,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 exports.endianness = function () { return 'LE' };
@@ -2352,7 +2597,7 @@ exports.EOL = '\n';
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2379,7 +2624,7 @@ exports.LogFilter = LogFilter;
 //# sourceMappingURL=logFilter.js.map
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2388,9 +2633,9 @@ exports.LogFilter = LogFilter;
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils = __webpack_require__(0);
-const moment_1 = __webpack_require__(27);
-const isBuffer = __webpack_require__(29);
-const isStream = __webpack_require__(30);
+const moment_1 = __webpack_require__(28);
+const isBuffer = __webpack_require__(30);
+const isStream = __webpack_require__(31);
 class Serializer {
     constructor(models) {
         this.models = models;
@@ -3088,7 +3333,7 @@ exports.MapperType = utils.strEnum([
 //# sourceMappingURL=serializer.js.map
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {//! moment.js
@@ -7555,10 +7800,10 @@ return hooks;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(29)(module)))
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -7586,7 +7831,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports) {
 
 /*!
@@ -7613,7 +7858,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7641,7 +7886,7 @@ isStream.transform = function (stream) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7685,7 +7930,7 @@ exports.TokenCredentials = TokenCredentials;
 //# sourceMappingURL=tokenCredentials.js.map
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7736,338 +7981,12 @@ exports.BasicAuthenticationCredentials = BasicAuthenticationCredentials;
 //# sourceMappingURL=basicAuthenticationCredentials.js.map
 
 /***/ }),
-/* 33 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(5);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__["a"]; });
-/* unused harmony reexport Constants */
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-
-
-
-
-
-/***/ }),
 /* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_ms_rest__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pollingState__ = __webpack_require__(35);
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information. 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-const LroStates = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].LongRunningOperationStates;
-/**
- * @class
- * Initializes a new instance of the AzureServiceClient class.
- * @constructor
- *
- * @param {msRest.ServiceClientCredentilas} credentials - ApplicationTokenCredentials or
- * UserTokenCredentials object used for authentication.
- * @param {AzureServiceClientOptions} options - The parameter options used by AzureServiceClient
- */
-class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceClient"] {
-    constructor(credentials, options) {
-        super(credentials, options);
-        this.acceptLanguage = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].DEFAULT_LANGUAGE;
-        this.generateClientRequestId = true;
-        this.longRunningOperationRetryTimeout = 30;
-        this.rpRegistrationRetryTimeout = 30;
-        this.acceptLanguage = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].DEFAULT_LANGUAGE;
-        this.generateClientRequestId = true;
-        this.longRunningOperationRetryTimeout = 30;
-        if (!options)
-            options = {};
-        if (options.acceptLanguage !== null && options.acceptLanguage !== undefined) {
-            this.acceptLanguage = options.acceptLanguage;
-        }
-        if (options.generateClientRequestId !== null && options.generateClientRequestId !== undefined) {
-            this.generateClientRequestId = options.generateClientRequestId;
-        }
-        if (options.longRunningOperationRetryTimeout !== null && options.longRunningOperationRetryTimeout !== undefined) {
-            this.longRunningOperationRetryTimeout = options.longRunningOperationRetryTimeout;
-        }
-        if (options.rpRegistrationRetryTimeout !== null && options.rpRegistrationRetryTimeout !== undefined) {
-            this.rpRegistrationRetryTimeout = options.rpRegistrationRetryTimeout;
-        }
-        try {
-            const moduleName = 'ms-rest-azure';
-            const moduleVersion = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].msRestAzureVersion;
-            this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
-        }
-        catch (err) {
-            // do nothing
-        }
-    }
-    /**
-     * Provides a mechanism to make a request that will poll and provide the final result.
-     * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
-     * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
-     * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
-     */
-    sendLongRunningRequest(request, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let self = this;
-            let initialResponse;
-            try {
-                initialResponse = yield self.sendRequest(request);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            let finalResponse;
-            try {
-                finalResponse = yield self.getLongRunningOperationResult(initialResponse, options);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            return Promise.resolve(finalResponse);
-        });
-    }
-    /**
-     * Verified whether an unexpected polling status code for long running operation was received for the response of the initial request.
-     * @param {msRest.HttpOperationResponse} initialResponse - Response to the initial request that was sent as a part of the asynchronous operation.
-     */
-    checkResponseStatusCodeFailed(initialResponse) {
-        let statusCode = initialResponse.response.status;
-        let method = initialResponse.request.method;
-        if (statusCode === 200 || statusCode === 202 ||
-            (statusCode === 201 && method === 'PUT') ||
-            (statusCode === 204 && (method === 'DELETE' || method === 'POST'))) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-    //goal is to get this working without using the async package and simply using async and Promise.
-    /**
-     * Poll Azure long running PUT, PATCH, POST or DELETE operations.
-     * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
-     * @param {msRest.RequestOptions} [options] - custom request options.
-     * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
-     */
-    getLongRunningOperationResult(resultOfInitialRequest, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let self = this;
-            let initialRequestMethod = resultOfInitialRequest.request.method;
-            if (self.checkResponseStatusCodeFailed(resultOfInitialRequest)) {
-                return Promise.reject(`Unexpected polling status code from long running operation ` +
-                    `"${resultOfInitialRequest.response.status}" for method "${initialRequestMethod}".`);
-            }
-            let pollingState;
-            try {
-                pollingState = new __WEBPACK_IMPORTED_MODULE_2__pollingState__["a" /* default */](resultOfInitialRequest, self.longRunningOperationRetryTimeout);
-                pollingState.optionsOfInitialRequest = options;
-            }
-            catch (error) {
-                return Promise.reject(error);
-            }
-            let resourceUrl = resultOfInitialRequest.request.url;
-            while (![LroStates.Succeeded, LroStates.Failed, LroStates.Canceled].some((e) => { return e === pollingState.status; })) {
-                yield __WEBPACK_IMPORTED_MODULE_0_ms_rest__["delay"](pollingState.getTimeout());
-                if (pollingState.azureAsyncOperationHeaderLink) {
-                    yield self.updateStateFromAzureAsyncOperationHeader(pollingState, true);
-                }
-                else if (pollingState.locationHeaderLink) {
-                    yield self.updateStateFromLocationHeader(initialRequestMethod, pollingState);
-                }
-                else if (initialRequestMethod === 'PUT') {
-                    yield self.updateStateFromGetResourceOperation(resourceUrl, pollingState);
-                }
-                else {
-                    return Promise.reject(new Error('Location header is missing from long running operation.'));
-                }
-            }
-            if (pollingState.status === LroStates.Succeeded) {
-                if ((pollingState.azureAsyncOperationHeaderLink || !pollingState.resource) &&
-                    (initialRequestMethod === 'PUT' || initialRequestMethod === 'PATCH')) {
-                    yield self.updateStateFromGetResourceOperation(resourceUrl, pollingState);
-                    return Promise.resolve(pollingState.getOperationResponse());
-                }
-                else {
-                    return Promise.resolve(pollingState.getOperationResponse());
-                }
-            }
-            else {
-                return Promise.reject(pollingState.getRestError());
-            }
-        });
-    }
-    /**
-     * Retrieve operation status by polling from 'azure-asyncoperation' header.
-     * @param {PollingState} pollingState - The object to persist current operation state.
-     * @param {boolean} inPostOrDelete - Invoked by Post Or Delete operation.
-     */
-    updateStateFromAzureAsyncOperationHeader(pollingState, inPostOrDelete = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let result;
-            try {
-                result = yield this.getStatus(pollingState.azureAsyncOperationHeaderLink, pollingState.optionsOfInitialRequest);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            let parsedResponse = result.bodyAsJson;
-            if (!parsedResponse || !parsedResponse.status) {
-                return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
-            }
-            pollingState.status = parsedResponse.status;
-            pollingState.error = parsedResponse.error;
-            pollingState.updateResponse(result.response);
-            pollingState.request = result.request;
-            pollingState.resource = null;
-            if (inPostOrDelete) {
-                pollingState.resource = result.bodyAsJson;
-            }
-            return Promise.resolve();
-        });
-    }
-    /**
-     * Retrieve PUT operation status by polling from 'location' header.
-     * @param {string} method - The HTTP method.
-     * @param {PollingState} pollingState - The object to persist current operation state.
-     */
-    updateStateFromLocationHeader(method, pollingState) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let result;
-            try {
-                result = yield this.getStatus(pollingState.locationHeaderLink, pollingState.optionsOfInitialRequest);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            let parsedResponse = result.bodyAsJson;
-            pollingState.updateResponse(result.response);
-            pollingState.request = result.request;
-            let statusCode = result.response.status;
-            if (statusCode === 202) {
-                pollingState.status = LroStates.InProgress;
-            }
-            else if (statusCode === 200 ||
-                (statusCode === 201 && method === 'PUT') ||
-                (statusCode === 204 && (method === 'DELETE' || method === 'POST'))) {
-                pollingState.status = LroStates.Succeeded;
-                pollingState.resource = parsedResponse;
-                //we might not throw an error, but initialize here just in case.
-                pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
-                pollingState.error.code = pollingState.status;
-            }
-            else {
-                return Promise.reject(new Error(`The response with status code ${statusCode} from polling for ` +
-                    `long running operation url "${pollingState.locationHeaderLink}" is not valid.`));
-            }
-        });
-    }
-    /**
-     * Polling for resource status.
-     * @param {string} resourceUrl - The url of resource.
-     * @param {PollingState} pollingState - The object to persist current operation state.
-     */
-    updateStateFromGetResourceOperation(resourceUrl, pollingState) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let result;
-            try {
-                result = yield this.getStatus(resourceUrl, pollingState.optionsOfInitialRequest);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            let parsedResponse = result.bodyAsJson;
-            pollingState.status = LroStates.Succeeded;
-            if (parsedResponse && parsedResponse.properties && parsedResponse.properties.provisioningState) {
-                pollingState.status = parsedResponse.properties.provisioningState;
-            }
-            pollingState.updateResponse(result.response);
-            pollingState.request = result.request;
-            pollingState.resource = parsedResponse;
-            //we might not throw an error, but initialize here just in case.
-            pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
-            pollingState.error.code = pollingState.status;
-            return Promise.resolve();
-        });
-    }
-    /**
-     * Retrieves operation status by querying the operation URL.
-     * @param {string} operationUrl - URL used to poll operation result.
-     * @param {object} options - Options that can be set on the request object
-     */
-    getStatus(operationUrl, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let self = this;
-            // Construct URL
-            let requestUrl = operationUrl.replace(' ', '%20');
-            // Create HTTP request object
-            let httpRequest = {
-                method: 'GET',
-                url: requestUrl,
-                headers: {}
-            };
-            if (options) {
-                let customHeaders = options.customHeaders;
-                for (let headerName in customHeaders) {
-                    if (customHeaders.hasOwnProperty(headerName)) {
-                        httpRequest.headers[headerName] = customHeaders[headerName];
-                    }
-                }
-            }
-            let operationResponse;
-            try {
-                operationResponse = yield self.sendRequest(httpRequest);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            let statusCode = operationResponse.response.status;
-            let responseBody = operationResponse.bodyAsJson;
-            if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
-                let error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
-                    `when polling for operation status.`);
-                error.statusCode = statusCode;
-                error.request = __WEBPACK_IMPORTED_MODULE_0_ms_rest__["stripRequest"](operationResponse.request);
-                error.response = operationResponse.response;
-                try {
-                    error.body = responseBody;
-                }
-                catch (badResponse) {
-                    error.message += ` Error "${badResponse}" occured while deserializing the response body - "${operationResponse.bodyAsText}".`;
-                    error.body = operationResponse.bodyAsText;
-                }
-                return Promise.reject(error);
-            }
-            return Promise.resolve(operationResponse);
-        });
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = AzureServiceClient;
-
-
-
-/***/ }),
-/* 35 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_constants__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_constants__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_ms_rest__);
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 

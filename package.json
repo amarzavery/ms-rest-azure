@@ -48,6 +48,6 @@
     "tsc": "tsc -p tsconfig.node.json && tsc -p tsconfig.browser.json",
     "test": "npm install && npm -s run-script unit",
     "unit": "mocha -t 50000 dist/test",
-    "build": "webpack && node_modules/uglify-es/bin/uglifyjs -c -m -o bundle.min.js bundle.js"
+    "build": "npm -s run-script tsc && webpack && node_modules/uglify-es/bin/uglifyjs --source-map -c -m -o bundle.min.js bundle.js"
   }
 }
