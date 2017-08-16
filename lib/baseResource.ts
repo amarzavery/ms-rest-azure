@@ -7,7 +7,7 @@
  */
 export interface BaseResource { }
 
-export const BaseResourcerMapper = {
+export const BaseResourceMapper = {
   required: false,
   serializedName: 'BaseResource',
   type: {

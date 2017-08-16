@@ -1634,7 +1634,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AzureServiceClient", function() { return __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Constants", function() { return __WEBPACK_IMPORTED_MODULE_1__util_constants__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CloudErrorMapper", function() { return __WEBPACK_IMPORTED_MODULE_2__cloudError__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BaseResourcerMapper", function() { return __WEBPACK_IMPORTED_MODULE_3__baseResource__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BaseResourceMapper", function() { return __WEBPACK_IMPORTED_MODULE_3__baseResource__["a"]; });
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
@@ -8887,7 +8887,7 @@ const CloudErrorMapper = {
 "use strict";
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
-const BaseResourcerMapper = {
+const BaseResourceMapper = {
     required: false,
     serializedName: 'BaseResource',
     type: {
@@ -8896,7 +8896,7 @@ const BaseResourcerMapper = {
         modelProperties: {}
     }
 };
-/* harmony export (immutable) */ __webpack_exports__["a"] = BaseResourcerMapper;
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseResourceMapper;
 
 
 

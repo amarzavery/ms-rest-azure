@@ -3,6 +3,6 @@
 import { AzureServiceClient } from './azureServiceClient';
 import Constants from './util/constants';
 import { CloudErrorMapper } from './cloudError';
-import { BaseResourcerMapper } from './baseResource';
-export { AzureServiceClient, Constants, CloudErrorMapper, BaseResourcerMapper };
+import { BaseResourceMapper } from './baseResource';
+export { AzureServiceClient, Constants, CloudErrorMapper, BaseResourceMapper };
 //# sourceMappingURL=msRestAzure.js.map

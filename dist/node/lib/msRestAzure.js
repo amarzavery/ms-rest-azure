@@ -9,5 +9,5 @@ exports.Constants = constants_1.default;
 const cloudError_1 = require("./cloudError");
 exports.CloudErrorMapper = cloudError_1.CloudErrorMapper;
 const baseResource_1 = require("./baseResource");
-exports.BaseResourcerMapper = baseResource_1.BaseResourcerMapper;
+exports.BaseResourceMapper = baseResource_1.BaseResourceMapper;
 //# sourceMappingURL=msRestAzure.js.map
