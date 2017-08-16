@@ -1629,10 +1629,16 @@ isStream.transform = function (stream) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cloudError__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__baseResource__ = __webpack_require__(40);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AzureServiceClient", function() { return __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Constants", function() { return __WEBPACK_IMPORTED_MODULE_1__util_constants__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CloudErrorMapper", function() { return __WEBPACK_IMPORTED_MODULE_2__cloudError__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BaseResourcerMapper", function() { return __WEBPACK_IMPORTED_MODULE_3__baseResource__["a"]; });
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
+
+
 
 
 
@@ -8814,6 +8820,83 @@ class PollingState {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PollingState;
+
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+const CloudErrorMapper = {
+    required: false,
+    serializedName: 'CloudError',
+    type: {
+        name: 'Composite',
+        className: 'CloudError',
+        modelProperties: {
+            code: {
+                required: true,
+                serializedName: 'code',
+                type: {
+                    name: 'String'
+                }
+            },
+            message: {
+                required: true,
+                serializedName: 'message',
+                type: {
+                    name: 'String'
+                }
+            },
+            target: {
+                required: false,
+                serializedName: 'target',
+                type: {
+                    name: 'String'
+                }
+            },
+            details: {
+                required: false,
+                serializedName: 'details',
+                type: {
+                    name: 'Sequence',
+                    element: {
+                        required: false,
+                        serializedName: 'CloudErrorElementType',
+                        type: {
+                            name: 'Composite',
+                            className: 'CloudError'
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = CloudErrorMapper;
+
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+const BaseResourcerMapper = {
+    required: false,
+    serializedName: 'BaseResource',
+    type: {
+        name: 'Composite',
+        className: 'BaseResource',
+        modelProperties: {}
+    }
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseResourcerMapper;
 
 
 
