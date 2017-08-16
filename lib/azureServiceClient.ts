@@ -127,7 +127,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {msRest.RequestOptions} [options] - custom request options.
    * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
    */
-  private async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
+  async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
     let self = this;
     let initialRequestMethod: string = resultOfInitialRequest.request.method as msRest.HttpMethods;
 
@@ -138,7 +138,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
     let pollingState: PollingState;
     try {
       pollingState = new PollingState(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
-      pollingState.optionsOfInitialRequest =  options as msRest.RequestOptions;
+      pollingState.optionsOfInitialRequest = options as msRest.RequestOptions;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -183,7 +183,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
 
-    let parsedResponse = result.bodyAsJson as {[key:string]: any};
+    let parsedResponse = result.bodyAsJson as { [key: string]: any };
 
     if (!parsedResponse || !parsedResponse.status) {
       return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
@@ -245,7 +245,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
       return Promise.reject(err);
     }
 
-    let parsedResponse = result.bodyAsJson as {[key:string]: any};
+    let parsedResponse = result.bodyAsJson as { [key: string]: any };
     pollingState.status = LroStates.Succeeded;
     if (parsedResponse && parsedResponse.properties && parsedResponse.properties.provisioningState) {
       pollingState.status = parsedResponse.properties.provisioningState;

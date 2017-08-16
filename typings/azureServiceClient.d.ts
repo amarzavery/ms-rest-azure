@@ -56,7 +56,7 @@ export declare class AzureServiceClient extends msRest.ServiceClient {
      * @param {msRest.RequestOptions} [options] - custom request options.
      * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
      */
-    private getLongRunningOperationResult(resultOfInitialRequest, options?);
+    getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse>;
     /**
      * Retrieve operation status by polling from 'azure-asyncoperation' header.
      * @param {PollingState} pollingState - The object to persist current operation state.

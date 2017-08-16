@@ -61,7 +61,7 @@ var className =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -69,13 +69,25 @@ var className =
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(process) {
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const uuid = __webpack_require__(21);
+const FormData = __webpack_require__(24);
 const webResource_1 = __webpack_require__(3);
-const constants_1 = __webpack_require__(1);
-const uuid = __webpack_require__(17);
+const constants_1 = __webpack_require__(2);
+const restError_1 = __webpack_require__(10);
+const httpOperationResponse_1 = __webpack_require__(11);
+const fPF = __webpack_require__(25)();
 /**
  * Checks if a parsed URL is HTTPS
  *
@@ -260,10 +272,143 @@ function strEnum(o) {
     }, Object.create(null)); // TODO: Audit usage of null.
 }
 exports.strEnum = strEnum;
+/**
+ * Converts a Promise to a callback.
+ * @param {Promise<any>} promise - The Promise to be converted to a callback
+ * @returns {Function} fn - A function that takes the callback (cb: Function): void
+ */
+function promiseToCallback(promise) {
+    if (typeof promise.then !== 'function') {
+        throw new Error('The provided input is not a Promise.');
+    }
+    return (cb) => {
+        promise.then((data) => {
+            process.nextTick(cb, null, data);
+        }, (err) => {
+            process.nextTick(cb, err);
+        });
+    };
+}
+exports.promiseToCallback = promiseToCallback;
+/**
+ * Converts a Promise to a service callback.
+ * @param {Promise<HttpOperationResponse>} promise - The Promise of HttpOperationResponse to be converted to a service callback
+ * @returns {Function} fn - A function that takes the service callback (cb: ServiceCallback<T>): void
+ */
+function promiseToServiceCallback(promise) {
+    if (typeof promise.then !== 'function') {
+        throw new Error('The provided input is not a Promise.');
+    }
+    return (cb) => {
+        promise.then((data) => {
+            process.nextTick(cb, null, data.bodyAsJson, data.request, data.response);
+        }, (err) => {
+            process.nextTick(cb, err);
+        });
+    };
+}
+exports.promiseToServiceCallback = promiseToServiceCallback;
+/**
+ * Sends the request and returns the received response.
+ * @param {WebResource} options - The request to be sent.
+ * @returns {Promise<HttpOperationResponse} operationResponse - The response object.
+ */
+function dispatchRequest(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!options) {
+            return Promise.reject(new Error('options (WebResource) cannot be null or undefined and must be of type object.'));
+        }
+        if (options.formData) {
+            const formData = options.formData;
+            const requestForm = new FormData();
+            const appendFormValue = (key, value) => {
+                if (value && value.hasOwnProperty('value') && value.hasOwnProperty('options')) {
+                    requestForm.append(key, value.value, value.options);
+                }
+                else {
+                    requestForm.append(key, value);
+                }
+            };
+            for (const formKey in formData) {
+                if (formData.hasOwnProperty(formKey)) {
+                    const formValue = formData[formKey];
+                    if (formValue instanceof Array) {
+                        for (let j = 0; j < formValue.length; j++) {
+                            appendFormValue(formKey, formValue[j]);
+                        }
+                    }
+                    else {
+                        appendFormValue(formKey, formValue);
+                    }
+                }
+            }
+            options.body = requestForm;
+            options.formData = undefined;
+            if (options.headers && options.headers['Content-Type'] &&
+                options.headers['Content-Type'].indexOf('multipart/form-data') > -1 && typeof requestForm.getBoundary === 'function') {
+                options.headers['Content-Type'] = `multipart/form-data; boundary=${requestForm.getBoundary()}`;
+            }
+        }
+        let res;
+        try {
+            res = yield fPF.fetch(options.url, options);
+        }
+        catch (err) {
+            return Promise.reject(err);
+        }
+        const operationResponse = new httpOperationResponse_1.HttpOperationResponse(options, res, res.body);
+        if (!options.rawResponse) {
+            try {
+                operationResponse.bodyAsText = yield res.text();
+            }
+            catch (err) {
+                let msg = `Error "${err}" occured while converting the raw response body into string.`;
+                let errCode = err.code || 'RAWTEXT_CONVERSION_ERROR';
+                let e = new restError_1.RestError(msg, errCode, res.status, options, res, res.body);
+                return Promise.reject(e);
+            }
+            try {
+                if (operationResponse.bodyAsText) {
+                    operationResponse.bodyAsJson = JSON.parse(operationResponse.bodyAsText);
+                }
+            }
+            catch (err) {
+                let msg = `Error "${err}" occured while executing JSON.parse on the response body - ${operationResponse.bodyAsText}.`;
+                let errCode = err.code || 'JSON_PARSE_ERROR';
+                let e = new restError_1.RestError(msg, errCode, res.status, options, res, operationResponse.bodyAsText);
+                return Promise.reject(e);
+            }
+        }
+        return Promise.resolve(operationResponse);
+    });
+}
+exports.dispatchRequest = dispatchRequest;
 //# sourceMappingURL=utils.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+Object.defineProperty(exports, "__esModule", { value: true });
+class BaseFilter {
+    constructor() { }
+    before(request) {
+        return Promise.resolve(request);
+    }
+    after(response) {
+        return Promise.resolve(response);
+    }
+}
+exports.BaseFilter = BaseFilter;
+//# sourceMappingURL=baseFilter.js.map
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -341,31 +486,10 @@ exports.Constants = {
          * @const
          * @type {string}
          */
-        USER_AGENT: 'user-agent'
+        USER_AGENT: 'User-Agent'
     }
 };
 //# sourceMappingURL=constants.js.map
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-Object.defineProperty(exports, "__esModule", { value: true });
-class BaseFilter {
-    constructor() { }
-    before(request) {
-        return Promise.resolve(request);
-    }
-    after(response) {
-        return Promise.resolve(response);
-    }
-}
-exports.BaseFilter = BaseFilter;
-//# sourceMappingURL=baseFilter.js.map
 
 /***/ }),
 /* 3 */
@@ -627,29 +751,31 @@ const Constants = {
 Object.defineProperty(exports, "__esModule", { value: true });
 const webResource_1 = __webpack_require__(3);
 exports.WebResource = webResource_1.WebResource;
-const httpOperationResponse_1 = __webpack_require__(8);
+const httpOperationResponse_1 = __webpack_require__(11);
 exports.HttpOperationResponse = httpOperationResponse_1.HttpOperationResponse;
-const restError_1 = __webpack_require__(9);
+const restError_1 = __webpack_require__(10);
 exports.RestError = restError_1.RestError;
-const serviceClient_1 = __webpack_require__(21);
+const serviceClient_1 = __webpack_require__(26);
 exports.ServiceClient = serviceClient_1.ServiceClient;
-const constants_1 = __webpack_require__(1);
+const constants_1 = __webpack_require__(2);
 exports.Constants = constants_1.Constants;
-const requestPipeline_1 = __webpack_require__(10);
+const requestPipeline_1 = __webpack_require__(12);
 exports.RequestPipeline = requestPipeline_1.RequestPipeline;
-const logFilter_1 = __webpack_require__(26);
+const logFilter_1 = __webpack_require__(31);
 exports.LogFilter = logFilter_1.LogFilter;
-const baseFilter_1 = __webpack_require__(2);
+const baseFilter_1 = __webpack_require__(1);
 exports.BaseFilter = baseFilter_1.BaseFilter;
-const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
+const exponentialRetryPolicyFilter_1 = __webpack_require__(13);
 exports.ExponentialRetryPolicyFilter = exponentialRetryPolicyFilter_1.ExponentialRetryPolicyFilter;
-const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
+const systemErrorRetryPolicyFilter_1 = __webpack_require__(14);
 exports.SystemErrorRetryPolicyFilter = systemErrorRetryPolicyFilter_1.SystemErrorRetryPolicyFilter;
-const signingFilter_1 = __webpack_require__(13);
+const redirectFilter_1 = __webpack_require__(15);
+exports.RedirectFilter = redirectFilter_1.RedirectFilter;
+const signingFilter_1 = __webpack_require__(16);
 exports.SigningFilter = signingFilter_1.SigningFilter;
-const msRestUserAgentFilter_1 = __webpack_require__(14);
+const msRestUserAgentFilter_1 = __webpack_require__(17);
 exports.MsRestUserAgentFilter = msRestUserAgentFilter_1.MsRestUserAgentFilter;
-const serializer_1 = __webpack_require__(27);
+const serializer_1 = __webpack_require__(32);
 exports.MapperType = serializer_1.MapperType;
 exports.Serializer = serializer_1.Serializer;
 exports.serializeObject = serializer_1.serializeObject;
@@ -660,15 +786,211 @@ exports.delay = utils_1.delay;
 exports.executePromisesSequentially = utils_1.executePromisesSequentially;
 exports.generateUuid = utils_1.generateUuid;
 exports.encodeUri = utils_1.encodeUri;
+exports.promiseToCallback = utils_1.promiseToCallback;
+exports.promiseToServiceCallback = utils_1.promiseToServiceCallback;
+exports.isValidUuid = utils_1.isValidUuid;
+exports.dispatchRequest = utils_1.dispatchRequest;
 // Credentials
-const tokenCredentials_1 = __webpack_require__(32);
+const tokenCredentials_1 = __webpack_require__(36);
 exports.TokenCredentials = tokenCredentials_1.TokenCredentials;
-const basicAuthenticationCredentials_1 = __webpack_require__(33);
+const basicAuthenticationCredentials_1 = __webpack_require__(37);
 exports.BasicAuthenticationCredentials = basicAuthenticationCredentials_1.BasicAuthenticationCredentials;
+const isStream = __webpack_require__(18);
+exports.isStream = isStream;
 //# sourceMappingURL=msRest.js.map
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {// Unique ID creation requires a high quality random # generator.  In the
@@ -705,10 +1027,37 @@ if (!rng) {
 
 module.exports = rng;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
-/* 7 */
+/* 8 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -737,7 +1086,29 @@ module.exports = bytesToUuid;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information. 
+Object.defineProperty(exports, "__esModule", { value: true });
+class RestError extends Error {
+    constructor(message, code, statusCode, request, response, body) {
+        super(message);
+        this.code = code;
+        this.statusCode = statusCode;
+        this.request = request;
+        this.response = response;
+        this.body = body;
+    }
+}
+exports.RestError = RestError;
+//# sourceMappingURL=restError.js.map
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -779,49 +1150,15 @@ exports.HttpOperationResponse = HttpOperationResponse;
 //# sourceMappingURL=httpOperationResponse.js.map
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information. 
-Object.defineProperty(exports, "__esModule", { value: true });
-class RestError extends Error {
-    constructor(message, code, statusCode, request, response, body) {
-        super(message);
-        this.code = code;
-        this.statusCode = statusCode;
-        this.request = request;
-        this.response = response;
-        this.body = body;
-    }
-}
-exports.RestError = RestError;
-//# sourceMappingURL=restError.js.map
-
-/***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const httpOperationResponse_1 = __webpack_require__(8);
-const restError_1 = __webpack_require__(9);
 const utils = __webpack_require__(0);
-const FormData = __webpack_require__(22);
-const fPF = __webpack_require__(23)();
 class RequestPipeline {
     constructor(filters, requestOptions) {
         this.filters = filters || [];
@@ -861,84 +1198,32 @@ class RequestPipeline {
         return requestFun;
     }
     requestSink(options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.requestOptions.method)
-                delete this.requestOptions.method;
-            utils.mergeObjects(this.requestOptions, options);
-            if (options.formData) {
-                const formData = options.formData;
-                const requestForm = new FormData();
-                const appendFormValue = (key, value) => {
-                    if (value && value.hasOwnProperty('value') && value.hasOwnProperty('options')) {
-                        requestForm.append(key, value.value, value.options);
-                    }
-                    else {
-                        requestForm.append(key, value);
-                    }
-                };
-                for (const formKey in formData) {
-                    if (formData.hasOwnProperty(formKey)) {
-                        const formValue = formData[formKey];
-                        if (formValue instanceof Array) {
-                            for (let j = 0; j < formValue.length; j++) {
-                                appendFormValue(formKey, formValue[j]);
-                            }
-                        }
-                        else {
-                            appendFormValue(formKey, formValue);
-                        }
-                    }
-                }
-                options.body = requestForm;
-                options.formData = undefined;
-            }
-            let res;
-            try {
-                res = yield fPF.fetch(options.url, options);
-            }
-            catch (err) {
-                throw err;
-            }
-            const operationResponse = new httpOperationResponse_1.HttpOperationResponse(options, res, res.body);
-            if (!options.rawResponse) {
-                try {
-                    operationResponse.bodyAsText = yield res.text();
-                }
-                catch (err) {
-                    let msg = `Error "${err}" occured while converting the raw response body into string.`;
-                    let errCode = err.code || 'RAWTEXT_CONVERSION_ERROR';
-                    let e = new restError_1.RestError(msg, errCode, res.status, options, res, res.body);
-                    return Promise.reject(e);
-                }
-                try {
-                    if (operationResponse.bodyAsText) {
-                        operationResponse.bodyAsJson = JSON.parse(operationResponse.bodyAsText);
-                    }
-                }
-                catch (err) {
-                    let msg = `Error "${err}" occured while executing JSON.parse on the response body - ${operationResponse.bodyAsText}.`;
-                    let errCode = err.code || 'JSON_PARSE_ERROR';
-                    let e = new restError_1.RestError(msg, errCode, res.status, options, res, operationResponse.bodyAsText);
-                    return Promise.reject(e);
-                }
-            }
-            return Promise.resolve(operationResponse);
-        });
+        if (this.requestOptions.method)
+            delete this.requestOptions.method;
+        return utils.dispatchRequest(options);
     }
 }
 exports.RequestPipeline = RequestPipeline;
 //# sourceMappingURL=requestPipeline.js.map
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const baseFilter_1 = __webpack_require__(2);
+const baseFilter_1 = __webpack_require__(1);
 const utils = __webpack_require__(0);
 /**
  * @class
@@ -957,10 +1242,10 @@ class ExponentialRetryPolicyFilter extends baseFilter_1.BaseFilter {
         this.DEFAULT_CLIENT_RETRY_COUNT = 3;
         this.DEFAULT_CLIENT_MAX_RETRY_INTERVAL = 1000 * 90;
         this.DEFAULT_CLIENT_MIN_RETRY_INTERVAL = 1000 * 3;
-        this.retryCount = retryCount || this.DEFAULT_CLIENT_RETRY_COUNT;
-        this.retryInterval = retryInterval || this.DEFAULT_CLIENT_RETRY_INTERVAL;
-        this.minRetryInterval = minRetryInterval || this.DEFAULT_CLIENT_MIN_RETRY_INTERVAL;
-        this.maxRetryInterval = maxRetryInterval || this.DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
+        this.retryCount = typeof retryCount === 'number' ? retryCount : this.DEFAULT_CLIENT_RETRY_COUNT;
+        this.retryInterval = typeof retryInterval === 'number' ? retryInterval : this.DEFAULT_CLIENT_RETRY_INTERVAL;
+        this.minRetryInterval = typeof minRetryInterval === 'number' ? minRetryInterval : this.DEFAULT_CLIENT_MIN_RETRY_INTERVAL;
+        this.maxRetryInterval = typeof maxRetryInterval === 'number' ? maxRetryInterval : this.DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
     }
     /**
      * Determines if the operation should be retried and how long to wait until the next retry.
@@ -1012,23 +1297,29 @@ class ExponentialRetryPolicyFilter extends baseFilter_1.BaseFilter {
         return retryData;
     }
     retry(operationResponse, retryData, err) {
-        const self = this;
-        const response = operationResponse.response;
-        retryData = self.updateRetryData(retryData, err);
-        if (!utils.objectIsNull(response) && self.shouldRetry(response.status, retryData)) {
-            // If previous operation ended with an error and the policy allows a retry, do that
-            return utils.delay(retryData.retryInterval).then(() => {
-                return self.retry(operationResponse, retryData, err);
-            });
-        }
-        else {
-            if (!utils.objectIsNull(err)) {
-                // If the operation failed in the end, return all errors instead of just the last one
-                err = retryData.error;
-                return Promise.reject(err);
+        return __awaiter(this, void 0, void 0, function* () {
+            const self = this;
+            const response = operationResponse.response;
+            retryData = self.updateRetryData(retryData, err);
+            if (!utils.objectIsNull(response) && self.shouldRetry(response.status, retryData)) {
+                try {
+                    yield utils.delay(retryData.retryInterval);
+                    let res = yield utils.dispatchRequest(operationResponse.request);
+                    return self.retry(res, retryData, err);
+                }
+                catch (err) {
+                    return self.retry(operationResponse, retryData, err);
+                }
             }
-            return Promise.resolve(operationResponse);
-        }
+            else {
+                if (!utils.objectIsNull(err)) {
+                    // If the operation failed in the end, return all errors instead of just the last one
+                    err = retryData.error;
+                    return Promise.reject(err);
+                }
+                return Promise.resolve(operationResponse);
+            }
+        });
     }
     after(operationResponse) {
         return this.retry(operationResponse);
@@ -1038,15 +1329,23 @@ exports.ExponentialRetryPolicyFilter = ExponentialRetryPolicyFilter;
 //# sourceMappingURL=exponentialRetryPolicyFilter.js.map
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const baseFilter_1 = __webpack_require__(2);
+const baseFilter_1 = __webpack_require__(1);
 const utils = __webpack_require__(0);
 /**
  * @class
@@ -1065,10 +1364,10 @@ class SystemErrorRetryPolicyFilter extends baseFilter_1.BaseFilter {
         this.DEFAULT_CLIENT_RETRY_COUNT = 3;
         this.DEFAULT_CLIENT_MAX_RETRY_INTERVAL = 1000 * 90;
         this.DEFAULT_CLIENT_MIN_RETRY_INTERVAL = 1000 * 3;
-        this.retryCount = retryCount || this.DEFAULT_CLIENT_RETRY_COUNT;
-        this.retryInterval = retryInterval || this.DEFAULT_CLIENT_RETRY_INTERVAL;
-        this.minRetryInterval = minRetryInterval || this.DEFAULT_CLIENT_MIN_RETRY_INTERVAL;
-        this.maxRetryInterval = maxRetryInterval || this.DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
+        this.retryCount = typeof retryCount === 'number' ? retryCount : this.DEFAULT_CLIENT_RETRY_COUNT;
+        this.retryInterval = typeof retryInterval === 'number' ? retryInterval : this.DEFAULT_CLIENT_RETRY_INTERVAL;
+        this.minRetryInterval = typeof minRetryInterval === 'number' ? minRetryInterval : this.DEFAULT_CLIENT_MIN_RETRY_INTERVAL;
+        this.maxRetryInterval = typeof maxRetryInterval === 'number' ? maxRetryInterval : this.DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
     }
     /**
      * Determines if the operation should be retried and how long to wait until the next retry.
@@ -1117,24 +1416,31 @@ class SystemErrorRetryPolicyFilter extends baseFilter_1.BaseFilter {
         return retryData;
     }
     retry(operationResponse, retryData, err) {
-        const self = this;
-        retryData = self.updateRetryData(retryData, err);
-        if (err && err.code && self.shouldRetry(retryData) &&
-            (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT' || err.code === 'ECONNREFUSED' ||
-                err.code === 'ECONNRESET' || err.code === 'ENOENT')) {
-            // If previous operation ended with an error and the policy allows a retry, do that
-            return utils.delay(retryData.retryInterval).then(() => {
-                return self.retry(operationResponse, retryData, err);
-            });
-        }
-        else {
-            if (!utils.objectIsNull(err)) {
-                // If the operation failed in the end, return all errors instead of just the last one
-                err = retryData.error;
-                return Promise.reject(err);
+        return __awaiter(this, void 0, void 0, function* () {
+            const self = this;
+            retryData = self.updateRetryData(retryData, err);
+            if (err && err.code && self.shouldRetry(retryData) &&
+                (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT' || err.code === 'ECONNREFUSED' ||
+                    err.code === 'ECONNRESET' || err.code === 'ENOENT')) {
+                // If previous operation ended with an error and the policy allows a retry, do that
+                try {
+                    yield utils.delay(retryData.retryInterval);
+                    let res = yield utils.dispatchRequest(operationResponse.request);
+                    return self.retry(res, retryData, err);
+                }
+                catch (err) {
+                    return self.retry(operationResponse, retryData, err);
+                }
             }
-            return Promise.resolve(operationResponse);
-        }
+            else {
+                if (!utils.objectIsNull(err)) {
+                    // If the operation failed in the end, return all errors instead of just the last one
+                    err = retryData.error;
+                    return Promise.reject(err);
+                }
+                return Promise.resolve(operationResponse);
+            }
+        });
     }
     after(operationResponse) {
         return this.retry(operationResponse); //See: https://github.com/Microsoft/TypeScript/issues/7426
@@ -1144,7 +1450,72 @@ exports.SystemErrorRetryPolicyFilter = SystemErrorRetryPolicyFilter;
 //# sourceMappingURL=systemErrorRetryPolicyFilter.js.map
 
 /***/ }),
-/* 13 */
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+const baseFilter_1 = __webpack_require__(1);
+const utils = __webpack_require__(0);
+const parse = __webpack_require__(27);
+class RedirectFilter extends baseFilter_1.BaseFilter {
+    constructor(maximumRetries = 20) {
+        super();
+        this.maximumRetries = maximumRetries;
+    }
+    handleRedirect(operationResponse, currentRetries) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let request = operationResponse.request;
+            let response = operationResponse.response;
+            if (response && response.headers && response.headers.get('location') &&
+                (response.status === 300 || response.status === 307 || (response.status === 303 && request.method === 'POST')) &&
+                (!this.maximumRetries || currentRetries < this.maximumRetries)) {
+                if (parse(response.headers.get('location')).hostname) {
+                    request.url = response.headers.get('location');
+                }
+                else {
+                    let urlObject = parse(request.url);
+                    urlObject.set('pathname', response.headers.get('location'));
+                    request.url = urlObject.href;
+                }
+                // POST request with Status code 303 should be converted into a 
+                // redirected GET request if the redirect url is present in the location header
+                if (response.status === 303) {
+                    request.method = 'GET';
+                }
+                let res;
+                try {
+                    res = yield utils.dispatchRequest(request);
+                    currentRetries++;
+                }
+                catch (err) {
+                    return Promise.reject(err);
+                }
+                return this.handleRedirect(res, currentRetries);
+            }
+            return Promise.resolve(operationResponse);
+        });
+    }
+    after(operationResponse) {
+        return this.handleRedirect(operationResponse, 0);
+    }
+}
+exports.RedirectFilter = RedirectFilter;
+//# sourceMappingURL=redirectFilter.js.map
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1152,7 +1523,7 @@ exports.SystemErrorRetryPolicyFilter = SystemErrorRetryPolicyFilter;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const baseFilter_1 = __webpack_require__(2);
+const baseFilter_1 = __webpack_require__(1);
 class SigningFilter extends baseFilter_1.BaseFilter {
     constructor(authenticationProvider) {
         super();
@@ -1167,7 +1538,7 @@ exports.SigningFilter = SigningFilter;
 //# sourceMappingURL=signingFilter.js.map
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1175,9 +1546,9 @@ exports.SigningFilter = SigningFilter;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const baseFilter_1 = __webpack_require__(2);
-const constants_1 = __webpack_require__(1);
-const os = __webpack_require__(25);
+const baseFilter_1 = __webpack_require__(1);
+const constants_1 = __webpack_require__(2);
+const os = __webpack_require__(30);
 const HeaderConstants = constants_1.Constants.HeaderConstants;
 class MsRestUserAgentFilter extends baseFilter_1.BaseFilter {
     constructor(userAgentInfo) {
@@ -1220,15 +1591,43 @@ class MsRestUserAgentFilter extends baseFilter_1.BaseFilter {
 }
 exports.MsRestUserAgentFilter = MsRestUserAgentFilter;
 //# sourceMappingURL=msRestUserAgentFilter.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 15 */
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isStream = module.exports = function (stream) {
+	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
+};
+
+isStream.writable = function (stream) {
+	return isStream(stream) && stream.writable !== false && typeof stream._write === 'function' && typeof stream._writableState === 'object';
+};
+
+isStream.readable = function (stream) {
+	return isStream(stream) && stream.readable !== false && typeof stream._read === 'function' && typeof stream._readableState === 'object';
+};
+
+isStream.duplex = function (stream) {
+	return isStream.writable(stream) && isStream.readable(stream);
+};
+
+isStream.transform = function (stream) {
+	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
+};
+
+
+/***/ }),
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(4);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AzureServiceClient", function() { return __WEBPACK_IMPORTED_MODULE_0__azureServiceClient__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Constants", function() { return __WEBPACK_IMPORTED_MODULE_1__util_constants__["a"]; });
@@ -1240,14 +1639,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 16 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_ms_rest__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pollingState__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pollingState__ = __webpack_require__(38);
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -1550,11 +1949,11 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
 
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var v1 = __webpack_require__(18);
-var v4 = __webpack_require__(20);
+var v1 = __webpack_require__(22);
+var v4 = __webpack_require__(23);
 
 var uuid = v4;
 uuid.v1 = v1;
@@ -1564,11 +1963,11 @@ module.exports = uuid;
 
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(6);
-var bytesToUuid = __webpack_require__(7);
+var rng = __webpack_require__(7);
+var bytesToUuid = __webpack_require__(9);
 
 // **`v1()` - Generate time-based UUID**
 //
@@ -1670,38 +2069,11 @@ module.exports = v1;
 
 
 /***/ }),
-/* 19 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(6);
-var bytesToUuid = __webpack_require__(7);
+var rng = __webpack_require__(7);
+var bytesToUuid = __webpack_require__(9);
 
 function v4(options, buf, offset) {
   var i = buf && offset || 0;
@@ -1732,117 +2104,7 @@ module.exports = v4;
 
 
 /***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const requestPipeline_1 = __webpack_require__(10);
-const exponentialRetryPolicyFilter_1 = __webpack_require__(11);
-const systemErrorRetryPolicyFilter_1 = __webpack_require__(12);
-const signingFilter_1 = __webpack_require__(13);
-const msRestUserAgentFilter_1 = __webpack_require__(14);
-const webResource_1 = __webpack_require__(3);
-const constants_1 = __webpack_require__(1);
-/**
- * @class
- * Initializes a new instance of the ServiceClient.
- * @constructor
- * @param {ServiceClientCredentials} [credentials]    - BasicAuthenticationCredentials or
- * TokenCredentials object used for authentication.
- *
- * @param {ServiceClientOptions} [options] The service client options that govern the behavior of the client.
- */
-class ServiceClient {
-    constructor(credentials, options) {
-        if (!options) {
-            options = {};
-        }
-        if (!options.requestOptions) {
-            options.requestOptions = {};
-        }
-        if (!options.filters) {
-            options.filters = [];
-        }
-        this.userAgentInfo = { value: [] };
-        if (credentials && !credentials.signRequest) {
-            throw new Error('credentials argument needs to implement signRequest method');
-        }
-        try {
-            const moduleName = 'ms-rest';
-            const moduleVersion = constants_1.Constants.msRestVersion;
-            this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
-        }
-        catch (err) {
-            // do nothing
-        }
-        if (credentials) {
-            options.filters.push(new signingFilter_1.SigningFilter(credentials));
-        }
-        options.filters.push(new msRestUserAgentFilter_1.MsRestUserAgentFilter(this.userAgentInfo.value));
-        if (!options.noRetryPolicy) {
-            options.filters.push(new exponentialRetryPolicyFilter_1.ExponentialRetryPolicyFilter());
-            options.filters.push(new systemErrorRetryPolicyFilter_1.SystemErrorRetryPolicyFilter());
-        }
-        this.pipeline = new requestPipeline_1.RequestPipeline(options.filters, options.requestOptions).create();
-    }
-    /**
-     * Adds custom information to user agent header
-     * @param {any} additionalUserAgentInfo - information to be added to user agent header, as string.
-     */
-    addUserAgentInfo(additionalUserAgentInfo) {
-        if (this.userAgentInfo.value.indexOf(additionalUserAgentInfo) === -1) {
-            this.userAgentInfo.value.push(additionalUserAgentInfo);
-        }
-        return;
-    }
-    sendRequest(options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (options === null || options === undefined || typeof options !== 'object') {
-                throw new Error('options cannot be null or undefined and it must be of type object.');
-            }
-            let httpRequest;
-            try {
-                if (options instanceof webResource_1.WebResource) {
-                    options.validateRequestProperties();
-                    httpRequest = options;
-                }
-                else {
-                    httpRequest = new webResource_1.WebResource();
-                    httpRequest = httpRequest.prepare(options);
-                }
-            }
-            catch (error) {
-                return Promise.reject(error);
-            }
-            // send request
-            let operationResponse;
-            try {
-                operationResponse = yield this.pipeline(httpRequest);
-            }
-            catch (err) {
-                return Promise.reject(err);
-            }
-            return Promise.resolve(operationResponse);
-        });
-    }
-}
-exports.ServiceClient = ServiceClient;
-//# sourceMappingURL=serviceClient.js.map
-
-/***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 /* eslint-env browser */
@@ -1850,7 +2112,7 @@ module.exports = typeof self == 'object' ? self.FormData : window.FormData;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
@@ -2356,197 +2618,658 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
 
 
 /***/ }),
-/* 24 */
-/***/ (function(module, exports) {
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
 
-// shim for using process in browser
-var process = module.exports = {};
+"use strict";
 
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const requestPipeline_1 = __webpack_require__(12);
+const exponentialRetryPolicyFilter_1 = __webpack_require__(13);
+const systemErrorRetryPolicyFilter_1 = __webpack_require__(14);
+const redirectFilter_1 = __webpack_require__(15);
+const signingFilter_1 = __webpack_require__(16);
+const msRestUserAgentFilter_1 = __webpack_require__(17);
+const webResource_1 = __webpack_require__(3);
+const constants_1 = __webpack_require__(2);
+/**
+ * @class
+ * Initializes a new instance of the ServiceClient.
+ * @constructor
+ * @param {ServiceClientCredentials} [credentials]    - BasicAuthenticationCredentials or
+ * TokenCredentials object used for authentication.
+ *
+ * @param {ServiceClientOptions} [options] The service client options that govern the behavior of the client.
+ */
+class ServiceClient {
+    constructor(credentials, options) {
+        if (!options) {
+            options = {};
         }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
+        if (!options.requestOptions) {
+            options.requestOptions = {};
         }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
+        if (!options.filters) {
+            options.filters = [];
+        }
+        this.userAgentInfo = { value: [] };
+        if (credentials && !credentials.signRequest) {
+            throw new Error('credentials argument needs to implement signRequest method');
+        }
         try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
+            const moduleName = 'ms-rest';
+            const moduleVersion = constants_1.Constants.msRestVersion;
+            this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
         }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
+        catch (err) {
+            // do nothing
         }
+        if (credentials) {
+            options.filters.push(new signingFilter_1.SigningFilter(credentials));
+        }
+        options.filters.push(new msRestUserAgentFilter_1.MsRestUserAgentFilter(this.userAgentInfo.value));
+        options.filters.push(new redirectFilter_1.RedirectFilter());
+        if (!options.noRetryPolicy) {
+            options.filters.push(new exponentialRetryPolicyFilter_1.ExponentialRetryPolicyFilter());
+            options.filters.push(new systemErrorRetryPolicyFilter_1.SystemErrorRetryPolicyFilter());
+        }
+        this.pipeline = new requestPipeline_1.RequestPipeline(options.filters, options.requestOptions).create();
     }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
+    /**
+     * Adds custom information to user agent header
+     * @param {any} additionalUserAgentInfo - information to be added to user agent header, as string.
+     */
+    addUserAgentInfo(additionalUserAgentInfo) {
+        if (this.userAgentInfo.value.indexOf(additionalUserAgentInfo) === -1) {
+            this.userAgentInfo.value.push(additionalUserAgentInfo);
+        }
         return;
     }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
+    sendRequest(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (options === null || options === undefined || typeof options !== 'object') {
+                throw new Error('options cannot be null or undefined and it must be of type object.');
             }
-        }
-        queueIndex = -1;
-        len = queue.length;
+            let httpRequest;
+            try {
+                if (options instanceof webResource_1.WebResource) {
+                    options.validateRequestProperties();
+                    httpRequest = options;
+                }
+                else {
+                    httpRequest = new webResource_1.WebResource();
+                    httpRequest = httpRequest.prepare(options);
+                }
+            }
+            catch (error) {
+                return Promise.reject(error);
+            }
+            // send request
+            let operationResponse;
+            try {
+                operationResponse = yield this.pipeline(httpRequest);
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
+            return Promise.resolve(operationResponse);
+        });
     }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
+}
+exports.ServiceClient = ServiceClient;
+//# sourceMappingURL=serviceClient.js.map
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+var required = __webpack_require__(28)
+  , qs = __webpack_require__(29)
+  , protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
+  , slashes = /^[A-Za-z][A-Za-z0-9+-.]*:\/\//;
+
+/**
+ * These are the parse rules for the URL parser, it informs the parser
+ * about:
+ *
+ * 0. The char it Needs to parse, if it's a string it should be done using
+ *    indexOf, RegExp using exec and NaN means set as current value.
+ * 1. The property we should set when parsing this value.
+ * 2. Indication if it's backwards or forward parsing, when set as number it's
+ *    the value of extra chars that should be split off.
+ * 3. Inherit from location if non existing in the parser.
+ * 4. `toLowerCase` the resulting value.
+ */
+var rules = [
+  ['#', 'hash'],                        // Extract from the back.
+  ['?', 'query'],                       // Extract from the back.
+  ['/', 'pathname'],                    // Extract from the back.
+  ['@', 'auth', 1],                     // Extract from the front.
+  [NaN, 'host', undefined, 1, 1],       // Set left over value.
+  [/:(\d+)$/, 'port', undefined, 1],    // RegExp the back.
+  [NaN, 'hostname', undefined, 1, 1]    // Set left over.
+];
+
+/**
+ * These properties should not be copied or inherited from. This is only needed
+ * for all non blob URL's as a blob URL does not include a hash, only the
+ * origin.
+ *
+ * @type {Object}
+ * @private
+ */
+var ignore = { hash: 1, query: 1 };
+
+/**
+ * The location object differs when your code is loaded through a normal page,
+ * Worker or through a worker using a blob. And with the blobble begins the
+ * trouble as the location object will contain the URL of the blob, not the
+ * location of the page where our code is loaded in. The actual origin is
+ * encoded in the `pathname` so we can thankfully generate a good "default"
+ * location from it so we can generate proper relative URL's again.
+ *
+ * @param {Object|String} loc Optional default location object.
+ * @returns {Object} lolcation object.
+ * @api public
+ */
+function lolcation(loc) {
+  loc = loc || global.location || {};
+
+  var finaldestination = {}
+    , type = typeof loc
+    , key;
+
+  if ('blob:' === loc.protocol) {
+    finaldestination = new URL(unescape(loc.pathname), {});
+  } else if ('string' === type) {
+    finaldestination = new URL(loc, {});
+    for (key in ignore) delete finaldestination[key];
+  } else if ('object' === type) {
+    for (key in loc) {
+      if (key in ignore) continue;
+      finaldestination[key] = loc[key];
+    }
+
+    if (finaldestination.slashes === undefined) {
+      finaldestination.slashes = slashes.test(loc.href);
+    }
+  }
+
+  return finaldestination;
 }
 
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
+/**
+ * @typedef ProtocolExtract
+ * @type Object
+ * @property {String} protocol Protocol matched in the URL, in lowercase.
+ * @property {Boolean} slashes `true` if protocol is followed by "//", else `false`.
+ * @property {String} rest Rest of the URL that is not part of the protocol.
+ */
 
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
+/**
+ * Extract protocol information from a URL with/without double slash ("//").
+ *
+ * @param {String} address URL we want to extract from.
+ * @return {ProtocolExtract} Extracted information.
+ * @api private
+ */
+function extractProtocol(address) {
+  var match = protocolre.exec(address);
+
+  return {
+    protocol: match[1] ? match[1].toLowerCase() : '',
+    slashes: !!match[2],
+    rest: match[3]
+  };
 }
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
+
+/**
+ * Resolve a relative URL pathname against a base URL pathname.
+ *
+ * @param {String} relative Pathname of the relative URL.
+ * @param {String} base Pathname of the base URL.
+ * @return {String} Resolved pathname.
+ * @api private
+ */
+function resolve(relative, base) {
+  var path = (base || '/').split('/').slice(0, -1).concat(relative.split('/'))
+    , i = path.length
+    , last = path[i - 1]
+    , unshift = false
+    , up = 0;
+
+  while (i--) {
+    if (path[i] === '.') {
+      path.splice(i, 1);
+    } else if (path[i] === '..') {
+      path.splice(i, 1);
+      up++;
+    } else if (up) {
+      if (i === 0) unshift = true;
+      path.splice(i, 1);
+      up--;
+    }
+  }
+
+  if (unshift) path.unshift('');
+  if (last === '.' || last === '..') path.push('');
+
+  return path.join('/');
+}
+
+/**
+ * The actual URL instance. Instead of returning an object we've opted-in to
+ * create an actual constructor as it's much more memory efficient and
+ * faster and it pleases my OCD.
+ *
+ * @constructor
+ * @param {String} address URL we want to parse.
+ * @param {Object|String} location Location defaults for relative paths.
+ * @param {Boolean|Function} parser Parser for the query string.
+ * @api public
+ */
+function URL(address, location, parser) {
+  if (!(this instanceof URL)) {
+    return new URL(address, location, parser);
+  }
+
+  var relative, extracted, parse, instruction, index, key
+    , instructions = rules.slice()
+    , type = typeof location
+    , url = this
+    , i = 0;
+
+  //
+  // The following if statements allows this module two have compatibility with
+  // 2 different API:
+  //
+  // 1. Node.js's `url.parse` api which accepts a URL, boolean as arguments
+  //    where the boolean indicates that the query string should also be parsed.
+  //
+  // 2. The `URL` interface of the browser which accepts a URL, object as
+  //    arguments. The supplied object will be used as default values / fall-back
+  //    for relative paths.
+  //
+  if ('object' !== type && 'string' !== type) {
+    parser = location;
+    location = null;
+  }
+
+  if (parser && 'function' !== typeof parser) parser = qs.parse;
+
+  location = lolcation(location);
+
+  //
+  // Extract protocol information before running the instructions.
+  //
+  extracted = extractProtocol(address || '');
+  relative = !extracted.protocol && !extracted.slashes;
+  url.slashes = extracted.slashes || relative && location.slashes;
+  url.protocol = extracted.protocol || location.protocol || '';
+  address = extracted.rest;
+
+  //
+  // When the authority component is absent the URL starts with a path
+  // component.
+  //
+  if (!extracted.slashes) instructions[2] = [/(.*)/, 'pathname'];
+
+  for (; i < instructions.length; i++) {
+    instruction = instructions[i];
+    parse = instruction[0];
+    key = instruction[1];
+
+    if (parse !== parse) {
+      url[key] = address;
+    } else if ('string' === typeof parse) {
+      if (~(index = address.indexOf(parse))) {
+        if ('number' === typeof instruction[2]) {
+          url[key] = address.slice(0, index);
+          address = address.slice(index + instruction[2]);
+        } else {
+          url[key] = address.slice(index);
+          address = address.slice(0, index);
+        }
+      }
+    } else if ((index = parse.exec(address))) {
+      url[key] = index[1];
+      address = address.slice(0, index.index);
+    }
+
+    url[key] = url[key] || (
+      relative && instruction[3] ? location[key] || '' : ''
+    );
+
+    //
+    // Hostname, host and protocol should be lowercased so they can be used to
+    // create a proper `origin`.
+    //
+    if (instruction[4]) url[key] = url[key].toLowerCase();
+  }
+
+  //
+  // Also parse the supplied query string in to an object. If we're supplied
+  // with a custom parser as function use that instead of the default build-in
+  // parser.
+  //
+  if (parser) url.query = parser(url.query);
+
+  //
+  // If the URL is relative, resolve the pathname against the base URL.
+  //
+  if (
+      relative
+    && location.slashes
+    && url.pathname.charAt(0) !== '/'
+    && (url.pathname !== '' || location.pathname !== '')
+  ) {
+    url.pathname = resolve(url.pathname, location.pathname);
+  }
+
+  //
+  // We should not add port numbers if they are already the default port number
+  // for a given protocol. As the host also contains the port number we're going
+  // override it with the hostname which contains no port number.
+  //
+  if (!required(url.port, url.protocol)) {
+    url.host = url.hostname;
+    url.port = '';
+  }
+
+  //
+  // Parse down the `auth` for the username and password.
+  //
+  url.username = url.password = '';
+  if (url.auth) {
+    instruction = url.auth.split(':');
+    url.username = instruction[0] || '';
+    url.password = instruction[1] || '';
+  }
+
+  url.origin = url.protocol && url.host && url.protocol !== 'file:'
+    ? url.protocol +'//'+ url.host
+    : 'null';
+
+  //
+  // The href is just the compiled result.
+  //
+  url.href = url.toString();
+}
+
+/**
+ * This is convenience method for changing properties in the URL instance to
+ * insure that they all propagate correctly.
+ *
+ * @param {String} part          Property we need to adjust.
+ * @param {Mixed} value          The newly assigned value.
+ * @param {Boolean|Function} fn  When setting the query, it will be the function
+ *                               used to parse the query.
+ *                               When setting the protocol, double slash will be
+ *                               removed from the final url if it is true.
+ * @returns {URL}
+ * @api public
+ */
+function set(part, value, fn) {
+  var url = this;
+
+  switch (part) {
+    case 'query':
+      if ('string' === typeof value && value.length) {
+        value = (fn || qs.parse)(value);
+      }
+
+      url[part] = value;
+      break;
+
+    case 'port':
+      url[part] = value;
+
+      if (!required(value, url.protocol)) {
+        url.host = url.hostname;
+        url[part] = '';
+      } else if (value) {
+        url.host = url.hostname +':'+ value;
+      }
+
+      break;
+
+    case 'hostname':
+      url[part] = value;
+
+      if (url.port) value += ':'+ url.port;
+      url.host = value;
+      break;
+
+    case 'host':
+      url[part] = value;
+
+      if (/:\d+$/.test(value)) {
+        value = value.split(':');
+        url.port = value.pop();
+        url.hostname = value.join(':');
+      } else {
+        url.hostname = value;
+        url.port = '';
+      }
+
+      break;
+
+    case 'protocol':
+      url.protocol = value.toLowerCase();
+      url.slashes = !fn;
+      break;
+
+    case 'pathname':
+      url.pathname = value.length && value.charAt(0) !== '/' ? '/' + value : value;
+
+      break;
+
+    default:
+      url[part] = value;
+  }
+
+  for (var i = 0; i < rules.length; i++) {
+    var ins = rules[i];
+
+    if (ins[4]) url[ins[1]] = url[ins[1]].toLowerCase();
+  }
+
+  url.origin = url.protocol && url.host && url.protocol !== 'file:'
+    ? url.protocol +'//'+ url.host
+    : 'null';
+
+  url.href = url.toString();
+
+  return url;
+}
+
+/**
+ * Transform the properties back in to a valid and full URL string.
+ *
+ * @param {Function} stringify Optional query stringify function.
+ * @returns {String}
+ * @api public
+ */
+function toString(stringify) {
+  if (!stringify || 'function' !== typeof stringify) stringify = qs.stringify;
+
+  var query
+    , url = this
+    , protocol = url.protocol;
+
+  if (protocol && protocol.charAt(protocol.length - 1) !== ':') protocol += ':';
+
+  var result = protocol + (url.slashes ? '//' : '');
+
+  if (url.username) {
+    result += url.username;
+    if (url.password) result += ':'+ url.password;
+    result += '@';
+  }
+
+  result += url.host + url.pathname;
+
+  query = 'object' === typeof url.query ? stringify(url.query) : url.query;
+  if (query) result += '?' !== query.charAt(0) ? '?'+ query : query;
+
+  if (url.hash) result += url.hash;
+
+  return result;
+}
+
+URL.prototype = { set: set, toString: toString };
+
+//
+// Expose the URL parser and some additional properties that might be useful for
+// others or testing.
+//
+URL.extractProtocol = extractProtocol;
+URL.location = lolcation;
+URL.qs = qs;
+
+module.exports = URL;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Check if we're required to add a port number.
+ *
+ * @see https://url.spec.whatwg.org/#default-port
+ * @param {Number|String} port Port number we need to check
+ * @param {String} protocol Protocol we need to check against.
+ * @returns {Boolean} Is it a default port for the given protocol
+ * @api private
+ */
+module.exports = function required(port, protocol) {
+  protocol = protocol.split(':')[0];
+  port = +port;
+
+  if (!port) return false;
+
+  switch (protocol) {
+    case 'http':
+    case 'ws':
+    return port !== 80;
+
+    case 'https':
+    case 'wss':
+    return port !== 443;
+
+    case 'ftp':
+    return port !== 21;
+
+    case 'gopher':
+    return port !== 70;
+
+    case 'file':
+    return false;
+  }
+
+  return port !== 0;
 };
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 25 */
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty;
+
+/**
+ * Decode a URI encoded string.
+ *
+ * @param {String} input The URI encoded string.
+ * @returns {String} The decoded string.
+ * @api private
+ */
+function decode(input) {
+  return decodeURIComponent(input.replace(/\+/g, ' '));
+}
+
+/**
+ * Simple query string parser.
+ *
+ * @param {String} query The query string that needs to be parsed.
+ * @returns {Object}
+ * @api public
+ */
+function querystring(query) {
+  var parser = /([^=?&]+)=?([^&]*)/g
+    , result = {}
+    , part;
+
+  //
+  // Little nifty parsing hack, leverage the fact that RegExp.exec increments
+  // the lastIndex property so we can continue executing this loop until we've
+  // parsed all results.
+  //
+  for (;
+    part = parser.exec(query);
+    result[decode(part[1])] = decode(part[2])
+  );
+
+  return result;
+}
+
+/**
+ * Transform a query string to an object.
+ *
+ * @param {Object} obj Object that should be transformed.
+ * @param {String} prefix Optional prefix.
+ * @returns {String}
+ * @api public
+ */
+function querystringify(obj, prefix) {
+  prefix = prefix || '';
+
+  var pairs = [];
+
+  //
+  // Optionally prefix with a '?' if needed
+  //
+  if ('string' !== typeof prefix) prefix = '?';
+
+  for (var key in obj) {
+    if (has.call(obj, key)) {
+      pairs.push(encodeURIComponent(key) +'='+ encodeURIComponent(obj[key]));
+    }
+  }
+
+  return pairs.length ? prefix + pairs.join('&') : '';
+}
+
+//
+// Expose the module.
+//
+exports.stringify = querystringify;
+exports.parse = querystring;
+
+
+/***/ }),
+/* 30 */
 /***/ (function(module, exports) {
 
 exports.endianness = function () { return 'LE' };
@@ -2597,7 +3320,7 @@ exports.EOL = '\n';
 
 
 /***/ }),
-/* 26 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2605,7 +3328,7 @@ exports.EOL = '\n';
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const baseFilter_1 = __webpack_require__(2);
+const baseFilter_1 = __webpack_require__(1);
 class LogFilter extends baseFilter_1.BaseFilter {
     constructor(logger = console.log) {
         super();
@@ -2624,7 +3347,7 @@ exports.LogFilter = LogFilter;
 //# sourceMappingURL=logFilter.js.map
 
 /***/ }),
-/* 27 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2633,12 +3356,12 @@ exports.LogFilter = LogFilter;
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils = __webpack_require__(0);
-const moment_1 = __webpack_require__(28);
-const isBuffer = __webpack_require__(30);
-const isStream = __webpack_require__(31);
+const moment_1 = __webpack_require__(33);
+const isBuffer = __webpack_require__(35);
+const isStream = __webpack_require__(18);
 class Serializer {
-    constructor(models) {
-        this.models = models;
+    constructor(mappers) {
+        this.modelMappers = mappers;
     }
     validateConstraints(mapper, value, objectName) {
         if (mapper.constraints && (value !== null || value !== undefined)) {
@@ -2928,7 +3651,7 @@ class Serializer {
                 }
                 //get the mapper if modelProperties of the CompositeType is not present and 
                 //then get the modelProperties from it.
-                modelMapper = new this.models[mapper.type.className]().mapper();
+                modelMapper = this.modelMappers[mapper.type.className];
                 if (!modelMapper) {
                     throw new Error(`mapper() cannot be null or undefined for model "${mapper.type.className}".`);
                 }
@@ -3057,7 +3780,7 @@ class Serializer {
                 }
                 //get the mapper if modelProperties of the CompositeType is not present and 
                 //then get the modelProperties from it.
-                modelMapper = new this.models[mapper.type.className]().mapper();
+                modelMapper = this.modelMappers[mapper.type.className];
                 if (!modelMapper) {
                     throw new Error(`mapper() cannot be null or undefined for model "${mapper.type.className}"`);
                 }
@@ -3244,13 +3967,13 @@ class Serializer {
             else {
                 indexDiscriminator = mapper.type.uberParent + '.' + object[discriminatorAsObject[polymorphicPropertyName]];
             }
-            if (!this.models.discriminators[indexDiscriminator]) {
+            if (!this.modelMappers.discriminators[indexDiscriminator]) {
                 throw new Error(`${discriminatorAsObject[polymorphicPropertyName]}": ` +
                     `"${object[discriminatorAsObject[polymorphicPropertyName]]}" in "${objectName}" is not a valid ` +
                     `discriminator as a corresponding model class for the disciminator "${indexDiscriminator}" ` +
-                    `was not found in this.models.discriminators object.`);
+                    `was not found in this.modelMappers.discriminators object.`);
             }
-            mapper = new this.models.discriminators[indexDiscriminator]().mapper();
+            mapper = this.modelMappers.discriminators[indexDiscriminator];
         }
         return mapper;
     }
@@ -3273,13 +3996,13 @@ class Serializer {
             else {
                 indexDiscriminator = mapper.type.uberParent + '.' + object[discriminatorAsString];
             }
-            if (!this.models.discriminators[indexDiscriminator]) {
+            if (!this.modelMappers.discriminators[indexDiscriminator]) {
                 throw new Error(`${discriminatorAsString}": ` +
                     `"${object[discriminatorAsString]}"  in "${objectName}" is not a valid ` +
                     `discriminator as a corresponding model class for the disciminator "${indexDiscriminator}" ` +
                     `was not found in this.models.discriminators object.`);
             }
-            mapper = new this.models.discriminators[indexDiscriminator]().mapper();
+            mapper = this.modelMappers.discriminators[indexDiscriminator];
         }
         return mapper;
     }
@@ -3333,7 +4056,7 @@ exports.MapperType = utils.strEnum([
 //# sourceMappingURL=serializer.js.map
 
 /***/ }),
-/* 28 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {//! moment.js
@@ -7800,10 +8523,10 @@ return hooks;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(29)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34)(module)))
 
 /***/ }),
-/* 29 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -7831,7 +8554,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 30 */
+/* 35 */
 /***/ (function(module, exports) {
 
 /*!
@@ -7858,35 +8581,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isStream = module.exports = function (stream) {
-	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
-};
-
-isStream.writable = function (stream) {
-	return isStream(stream) && stream.writable !== false && typeof stream._write === 'function' && typeof stream._writableState === 'object';
-};
-
-isStream.readable = function (stream) {
-	return isStream(stream) && stream.readable !== false && typeof stream._read === 'function' && typeof stream._readableState === 'object';
-};
-
-isStream.duplex = function (stream) {
-	return isStream.writable(stream) && isStream.readable(stream);
-};
-
-isStream.transform = function (stream) {
-	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
-};
-
-
-/***/ }),
-/* 32 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7894,7 +8589,7 @@ isStream.transform = function (stream) {
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = __webpack_require__(1);
+const constants_1 = __webpack_require__(2);
 const HeaderConstants = constants_1.Constants.HeaderConstants;
 const DEFAULT_AUTHORIZATION_SCHEME = 'Bearer';
 /**
@@ -7930,7 +8625,7 @@ exports.TokenCredentials = TokenCredentials;
 //# sourceMappingURL=tokenCredentials.js.map
 
 /***/ }),
-/* 33 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7938,7 +8633,7 @@ exports.TokenCredentials = TokenCredentials;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = __webpack_require__(1);
+const constants_1 = __webpack_require__(2);
 const HeaderConstants = constants_1.Constants.HeaderConstants;
 const DEFAULT_AUTHORIZATION_SCHEME = 'Basic';
 /**
@@ -7981,7 +8676,7 @@ exports.BasicAuthenticationCredentials = BasicAuthenticationCredentials;
 //# sourceMappingURL=basicAuthenticationCredentials.js.map
 
 /***/ }),
-/* 34 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
