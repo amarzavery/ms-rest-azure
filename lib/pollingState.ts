@@ -56,8 +56,20 @@ export default class PollingState {
     this.retryTimeout = retryTimeout;
     this.updateResponse(resultOfInitialRequest.response);
     this.request = resultOfInitialRequest.request;
-    this.resource = resultOfInitialRequest.bodyAsJson;
-
+    //Parse response.body & assign it as the resource
+    try {
+      if (resultOfInitialRequest.bodyAsText && resultOfInitialRequest.bodyAsText.length > 0) {
+        this.resource = JSON.parse(resultOfInitialRequest.bodyAsText);
+      } else {
+        this.resource = resultOfInitialRequest.bodyAsJson;
+      }
+    } catch (error) {
+      let deserializationError = new msRest.RestError(`Error "${error}" occurred in parsing the responseBody ' +
+        'while creating the PollingState for Long Running Operation- "${resultOfInitialRequest.bodyAsText}"`);
+      deserializationError.request = resultOfInitialRequest.request;
+      deserializationError.response = resultOfInitialRequest.response;
+      throw deserializationError;
+    }
     switch (this.response.status) {
       case 202:
         this.status = LroStates.InProgress;
@@ -154,7 +166,7 @@ export default class PollingState {
     error.request = msRest.stripRequest(this.request);
     error.response = this.response;
     let parsedResponse = this.resultOfInitialRequest.bodyAsJson as { [key: string]: any };
-    
+
     if (err && err.message) {
       errMsg = `Long running operation failed with error: "${err.message}".`;
     } else {
