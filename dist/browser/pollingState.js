@@ -121,7 +121,7 @@ export default class PollingState {
         let error = new msRest.RestError('');
         error.request = msRest.stripRequest(this.request);
         error.response = this.response;
-        let parsedResponse = this.resultOfInitialRequest.bodyAsJson;
+        let parsedResponse = this.resource;
         if (err && err.message) {
             errMsg = `Long running operation failed with error: "${err.message}".`;
         }

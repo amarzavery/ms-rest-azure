@@ -165,8 +165,11 @@ export class AzureServiceClient extends msRest.ServiceClient {
                 return Promise.reject(err);
             }
             let parsedResponse = result.bodyAsJson;
-            if (!parsedResponse || !parsedResponse.status) {
-                return Promise.reject(new Error('The response "${responseBody}" from long running operation does not contain the status property.'));
+            if (!parsedResponse) {
+                return Promise.reject(new Error('The response from long running operation does not contain a body.'));
+            }
+            else if (parsedResponse && !parsedResponse.status) {
+                return Promise.reject(new Error(`The response "${result.bodyAsText}" from long running operation does not contain the status property.`));
             }
             pollingState.status = parsedResponse.status;
             pollingState.error = parsedResponse.error;
@@ -201,7 +204,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
                 pollingState.status = LroStates.InProgress;
             }
             else if (statusCode === 200 ||
-                (statusCode === 201 && method === 'PUT') ||
+                (statusCode === 201 && (method === 'PUT' || method === 'PATCH')) ||
                 (statusCode === 204 && (method === 'DELETE' || method === 'POST'))) {
                 pollingState.status = LroStates.Succeeded;
                 pollingState.resource = parsedResponse;
@@ -228,6 +231,9 @@ export class AzureServiceClient extends msRest.ServiceClient {
             }
             catch (err) {
                 return Promise.reject(err);
+            }
+            if (!result.bodyAsJson) {
+                return Promise.reject(new Error('The response from long running operation does not contain a body.'));
             }
             let parsedResponse = result.bodyAsJson;
             pollingState.status = LroStates.Succeeded;
@@ -277,7 +283,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
             let statusCode = operationResponse.response.status;
             let responseBody = operationResponse.bodyAsJson;
             if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
-                let error = new msRest.RestError(`Invalid status code with response body "${operationResponse.response.body}" occurred ` +
+                let error = new msRest.RestError(`Invalid status code with response body "${operationResponse.bodyAsText}" occurred ` +
                     `when polling for operation status.`);
                 error.statusCode = statusCode;
                 error.request = msRest.stripRequest(operationResponse.request);
