@@ -1,11 +1,11 @@
 {
-  "name": "ms-rest-azure",
+  "name": "ms-rest-azure-ts",
   "author": {
     "name": "Microsoft Corporation",
     "email": "azsdkteam@microsoft.com",
     "url": "https://github.com/Azure/azure-sdk-for-node"
   },
-  "version": "3.0.0",
+  "version": "0.1.0",
   "description": "Client Runtime for Node.js client libraries generated using AutoRest",
   "tags": [
     "node",
@@ -23,7 +23,7 @@
   "types": "./typings/lib/msRestAzure.d.ts",
   "license": "MIT",
   "dependencies": {
-    "ms-rest": "amarzavery/ms-rest#master"
+    "ms-rest-ts": "amarzavery/ms-rest#master"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
