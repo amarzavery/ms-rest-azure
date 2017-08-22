@@ -1,4 +1,4 @@
-import * as msRest from 'ms-rest';
+import * as msRest from 'ms-rest-ts';
 /**
  * Options to be provided while creating the client.
  */
@@ -41,10 +41,10 @@ export declare class AzureServiceClient extends msRest.ServiceClient {
     /**
      * Provides a mechanism to make a request that will poll and provide the final result.
      * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
-     * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
+     * @param {msRest.RequestOptionsBase} [options] Additional options to be sent while making the request
      * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
      */
-    sendLongRunningRequest(request: msRest.RequestPrepareOptions | msRest.WebResource, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse>;
+    sendLongRunningRequest(request: msRest.RequestPrepareOptions | msRest.WebResource, options?: msRest.RequestOptionsBase): Promise<msRest.HttpOperationResponse>;
     /**
      * Verified whether an unexpected polling status code for long running operation was received for the response of the initial request.
      * @param {msRest.HttpOperationResponse} initialResponse - Response to the initial request that was sent as a part of the asynchronous operation.
@@ -53,10 +53,10 @@ export declare class AzureServiceClient extends msRest.ServiceClient {
     /**
      * Poll Azure long running PUT, PATCH, POST or DELETE operations.
      * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
-     * @param {msRest.RequestOptions} [options] - custom request options.
+     * @param {msRest.RequestOptionsBase} [options] - custom request options.
      * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
      */
-    getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse>;
+    getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptionsBase): Promise<msRest.HttpOperationResponse>;
     /**
      * Retrieve operation status by polling from 'azure-asyncoperation' header.
      * @param {PollingState} pollingState - The object to persist current operation state.

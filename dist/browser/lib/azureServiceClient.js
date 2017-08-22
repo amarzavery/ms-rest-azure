@@ -1,4 +1,3 @@
-"use strict";
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -9,11 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const msRest = require("ms-rest");
-const constants_1 = require("./util/constants");
-const pollingState_1 = require("./pollingState");
-const LroStates = constants_1.default.LongRunningOperationStates;
+import * as msRest from 'ms-rest-ts';
+import Constants from './util/constants';
+import PollingState from './pollingState';
+const LroStates = Constants.LongRunningOperationStates;
 /**
  * @class
  * Initializes a new instance of the AzureServiceClient class.
@@ -23,14 +21,14 @@ const LroStates = constants_1.default.LongRunningOperationStates;
  * UserTokenCredentials object used for authentication.
  * @param {AzureServiceClientOptions} options - The parameter options used by AzureServiceClient
  */
-class AzureServiceClient extends msRest.ServiceClient {
+export class AzureServiceClient extends msRest.ServiceClient {
     constructor(credentials, options) {
         super(credentials, options);
-        this.acceptLanguage = constants_1.default.DEFAULT_LANGUAGE;
+        this.acceptLanguage = Constants.DEFAULT_LANGUAGE;
         this.generateClientRequestId = true;
         this.longRunningOperationRetryTimeout = 30;
         this.rpRegistrationRetryTimeout = 30;
-        this.acceptLanguage = constants_1.default.DEFAULT_LANGUAGE;
+        this.acceptLanguage = Constants.DEFAULT_LANGUAGE;
         this.generateClientRequestId = true;
         this.longRunningOperationRetryTimeout = 30;
         if (!options)
@@ -49,7 +47,7 @@ class AzureServiceClient extends msRest.ServiceClient {
         }
         try {
             const moduleName = 'ms-rest-azure';
-            const moduleVersion = constants_1.default.msRestAzureVersion;
+            const moduleVersion = Constants.msRestAzureVersion;
             this.addUserAgentInfo(`${moduleName}/${moduleVersion}`);
         }
         catch (err) {
@@ -59,7 +57,7 @@ class AzureServiceClient extends msRest.ServiceClient {
     /**
      * Provides a mechanism to make a request that will poll and provide the final result.
      * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
-     * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
+     * @param {msRest.RequestOptionsBase} [options] Additional options to be sent while making the request
      * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
      */
     sendLongRunningRequest(request, options) {
@@ -102,7 +100,7 @@ class AzureServiceClient extends msRest.ServiceClient {
     /**
      * Poll Azure long running PUT, PATCH, POST or DELETE operations.
      * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
-     * @param {msRest.RequestOptions} [options] - custom request options.
+     * @param {msRest.RequestOptionsBase} [options] - custom request options.
      * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
      */
     getLongRunningOperationResult(resultOfInitialRequest, options) {
@@ -115,7 +113,7 @@ class AzureServiceClient extends msRest.ServiceClient {
             }
             let pollingState;
             try {
-                pollingState = new pollingState_1.default(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
+                pollingState = new PollingState(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
                 pollingState.optionsOfInitialRequest = options;
             }
             catch (error) {
@@ -303,5 +301,4 @@ class AzureServiceClient extends msRest.ServiceClient {
         });
     }
 }
-exports.AzureServiceClient = AzureServiceClient;
 //# sourceMappingURL=azureServiceClient.js.map

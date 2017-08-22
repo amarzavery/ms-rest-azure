@@ -29,7 +29,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
     alias: {
       moment: path.resolve('./node_modules/moment'),
-      "ms-rest": path.resolve('./node_modules/ms-rest/dist/node/lib/msRest.js')
+      "ms-rest-ts": path.resolve('./node_modules/ms-rest-ts/dist/node/lib/msRest.js')
     }
   },
   node: {

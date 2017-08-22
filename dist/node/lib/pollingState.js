@@ -3,7 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("./util/constants");
-const msRest = require("ms-rest");
+const msRest = require("ms-rest-ts");
 const LroStates = constants_1.default.LongRunningOperationStates;
 /**
  * @class

@@ -12,7 +12,7 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "dist/node",
+    "outDir": "dist/node/lib",
     "allowJs": false,
     "strict": true,
     "strictNullChecks": true,

@@ -87,7 +87,7 @@ const webResource_1 = __webpack_require__(3);
 const constants_1 = __webpack_require__(2);
 const restError_1 = __webpack_require__(10);
 const httpOperationResponse_1 = __webpack_require__(11);
-const fPF = __webpack_require__(25)();
+const fPF = __webpack_require__(25)({ useCookie: true });
 /**
  * Checks if a parsed URL is HTTPS
  *
@@ -1649,8 +1649,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_ms_rest__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_constants__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pollingState__ = __webpack_require__(38);
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -1676,7 +1676,7 @@ const LroStates = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default *
  * UserTokenCredentials object used for authentication.
  * @param {AzureServiceClientOptions} options - The parameter options used by AzureServiceClient
  */
-class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceClient"] {
+class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__["ServiceClient"] {
     constructor(credentials, options) {
         super(credentials, options);
         this.acceptLanguage = __WEBPACK_IMPORTED_MODULE_1__util_constants__["a" /* default */].DEFAULT_LANGUAGE;
@@ -1712,7 +1712,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
     /**
      * Provides a mechanism to make a request that will poll and provide the final result.
      * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
-     * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
+     * @param {msRest.RequestOptionsBase} [options] Additional options to be sent while making the request
      * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
      */
     sendLongRunningRequest(request, options) {
@@ -1755,7 +1755,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
     /**
      * Poll Azure long running PUT, PATCH, POST or DELETE operations.
      * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
-     * @param {msRest.RequestOptions} [options] - custom request options.
+     * @param {msRest.RequestOptionsBase} [options] - custom request options.
      * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
      */
     getLongRunningOperationResult(resultOfInitialRequest, options) {
@@ -1776,7 +1776,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             }
             let resourceUrl = resultOfInitialRequest.request.url;
             while (![LroStates.Succeeded, LroStates.Failed, LroStates.Canceled].some((e) => { return e === pollingState.status; })) {
-                yield __WEBPACK_IMPORTED_MODULE_0_ms_rest__["delay"](pollingState.getTimeout());
+                yield __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__["delay"](pollingState.getTimeout());
                 if (pollingState.azureAsyncOperationHeaderLink) {
                     yield self.updateStateFromAzureAsyncOperationHeader(pollingState, true);
                 }
@@ -1864,7 +1864,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
                 pollingState.status = LroStates.Succeeded;
                 pollingState.resource = parsedResponse;
                 //we might not throw an error, but initialize here just in case.
-                pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
+                pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
                 pollingState.error.code = pollingState.status;
             }
             else {
@@ -1899,7 +1899,7 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             pollingState.request = result.request;
             pollingState.resource = parsedResponse;
             //we might not throw an error, but initialize here just in case.
-            pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
+            pollingState.error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__["RestError"](`Long running operation failed with status "${pollingState.status}".`);
             pollingState.error.code = pollingState.status;
             return Promise.resolve();
         });
@@ -1938,10 +1938,10 @@ class AzureServiceClient extends __WEBPACK_IMPORTED_MODULE_0_ms_rest__["ServiceC
             let statusCode = operationResponse.response.status;
             let responseBody = operationResponse.bodyAsJson;
             if (statusCode !== 200 && statusCode !== 201 && statusCode !== 202 && statusCode !== 204) {
-                let error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest__["RestError"](`Invalid status code with response body "${operationResponse.bodyAsText}" occurred ` +
+                let error = new __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__["RestError"](`Invalid status code with response body "${operationResponse.bodyAsText}" occurred ` +
                     `when polling for operation status.`);
                 error.statusCode = statusCode;
-                error.request = __WEBPACK_IMPORTED_MODULE_0_ms_rest__["stripRequest"](operationResponse.request);
+                error.request = __WEBPACK_IMPORTED_MODULE_0_ms_rest_ts__["stripRequest"](operationResponse.request);
                 error.response = operationResponse.response;
                 try {
                     error.body = responseBody;
@@ -8693,8 +8693,8 @@ exports.BasicAuthenticationCredentials = BasicAuthenticationCredentials;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_constants__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_ms_rest__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest_ts__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ms_rest_ts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_ms_rest_ts__);
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 
@@ -8724,7 +8724,7 @@ class PollingState {
             }
         }
         catch (error) {
-            let deserializationError = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["RestError"](`Error "${error}" occurred in parsing the responseBody ' +
+            let deserializationError = new __WEBPACK_IMPORTED_MODULE_1_ms_rest_ts__["RestError"](`Error "${error}" occurred in parsing the responseBody ' +
         'while creating the PollingState for Long Running Operation- "${resultOfInitialRequest.bodyAsText}"`);
             deserializationError.request = resultOfInitialRequest.request;
             deserializationError.response = resultOfInitialRequest.response;
@@ -8796,7 +8796,7 @@ class PollingState {
      * @returns {msRest.HttpOperationResponse} HttpOperationResponse
      */
     getOperationResponse() {
-        let result = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["HttpOperationResponse"](this.request, this.response, this.response.body);
+        let result = new __WEBPACK_IMPORTED_MODULE_1_ms_rest_ts__["HttpOperationResponse"](this.request, this.response, this.response.body);
         if (this.resource && typeof this.resource.valueOf() === 'string') {
             result.bodyAsText = this.resource;
             result.bodyAsJson = JSON.parse(this.resource);
@@ -8815,8 +8815,8 @@ class PollingState {
     getRestError(err) {
         let errMsg;
         let errCode = null;
-        let error = new __WEBPACK_IMPORTED_MODULE_1_ms_rest__["RestError"]('');
-        error.request = __WEBPACK_IMPORTED_MODULE_1_ms_rest__["stripRequest"](this.request);
+        let error = new __WEBPACK_IMPORTED_MODULE_1_ms_rest_ts__["RestError"]('');
+        error.request = __WEBPACK_IMPORTED_MODULE_1_ms_rest_ts__["stripRequest"](this.request);
         error.response = this.response;
         let parsedResponse = this.resource;
         if (err && err.message) {

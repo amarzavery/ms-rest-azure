@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 
-import * as msRest from 'ms-rest';
+import * as msRest from 'ms-rest-ts';
 import Constants from './util/constants';
 import PollingState from './pollingState';
 const LroStates = Constants.LongRunningOperationStates;
@@ -84,10 +84,10 @@ export class AzureServiceClient extends msRest.ServiceClient {
   /**
    * Provides a mechanism to make a request that will poll and provide the final result.
    * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
-   * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
+   * @param {msRest.RequestOptionsBase} [options] Additional options to be sent while making the request
    * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
    */
-  async sendLongRunningRequest(request: msRest.RequestPrepareOptions | msRest.WebResource, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
+  async sendLongRunningRequest(request: msRest.RequestPrepareOptions | msRest.WebResource, options?: msRest.RequestOptionsBase): Promise<msRest.HttpOperationResponse> {
     let self = this;
     let initialResponse: msRest.HttpOperationResponse;
     try {
@@ -124,10 +124,10 @@ export class AzureServiceClient extends msRest.ServiceClient {
   /**
    * Poll Azure long running PUT, PATCH, POST or DELETE operations.
    * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
-   * @param {msRest.RequestOptions} [options] - custom request options.
+   * @param {msRest.RequestOptionsBase} [options] - custom request options.
    * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
    */
-  async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
+  async getLongRunningOperationResult(resultOfInitialRequest: msRest.HttpOperationResponse, options?: msRest.RequestOptionsBase): Promise<msRest.HttpOperationResponse> {
     let self = this;
     let initialRequestMethod: string = resultOfInitialRequest.request.method as msRest.HttpMethods;
 
@@ -138,7 +138,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
     let pollingState: PollingState;
     try {
       pollingState = new PollingState(resultOfInitialRequest, self.longRunningOperationRetryTimeout);
-      pollingState.optionsOfInitialRequest = options as msRest.RequestOptions;
+      pollingState.optionsOfInitialRequest = options as msRest.RequestOptionsBase;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -269,7 +269,7 @@ export class AzureServiceClient extends msRest.ServiceClient {
    * @param {string} operationUrl - URL used to poll operation result.
    * @param {object} options - Options that can be set on the request object
    */
-  private async getStatus(operationUrl: string, options?: msRest.RequestOptions): Promise<msRest.HttpOperationResponse> {
+  private async getStatus(operationUrl: string, options?: msRest.RequestOptionsBase): Promise<msRest.HttpOperationResponse> {
     let self = this;
     // Construct URL
     let requestUrl = operationUrl.replace(' ', '%20');

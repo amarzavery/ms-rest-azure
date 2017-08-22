@@ -1,4 +1,4 @@
-import * as msRest from 'ms-rest';
+import * as msRest from 'ms-rest-ts';
 /**
  * @class
  * Initializes a new instance of the PollingState class.
@@ -9,9 +9,9 @@ export default class PollingState {
      */
     resultOfInitialRequest: msRest.HttpOperationResponse;
     /**
-     * @param {msRest.RequestOptions} [optionsOfInitialRequest] - Request options that were provided as a part of the initial request.
+     * @param {msRest.RequestOptionsBase} [optionsOfInitialRequest] - Request options that were provided as a part of the initial request.
      */
-    optionsOfInitialRequest: msRest.RequestOptions;
+    optionsOfInitialRequest: msRest.RequestOptionsBase;
     /**
      * @param {msRest.WebResource} [request] - provides information about the request made for polling.
      */

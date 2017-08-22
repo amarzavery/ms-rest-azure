@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information. 
 import Constants from './util/constants';
-import * as msRest from 'ms-rest';
+import * as msRest from 'ms-rest-ts';
 const LroStates = Constants.LongRunningOperationStates;
 /**
  * @class

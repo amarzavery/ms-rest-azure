@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const msRest = require("ms-rest");
+const msRest = require("ms-rest-ts");
 const constants_1 = require("./util/constants");
 const pollingState_1 = require("./pollingState");
 const LroStates = constants_1.default.LongRunningOperationStates;
@@ -59,7 +59,7 @@ class AzureServiceClient extends msRest.ServiceClient {
     /**
      * Provides a mechanism to make a request that will poll and provide the final result.
      * @param {msRest.RequestPrepareOptions|msRest.WebResource} request - The request object
-     * @param {msRest.RequestOptions} [options] Additional options to be sent while making the request
+     * @param {msRest.RequestOptionsBase} [options] Additional options to be sent while making the request
      * @returns {Promise<msRest.HttpOperationResponse>} The HttpOperationResponse containing the final polling request, response and the responseBody.
      */
     sendLongRunningRequest(request, options) {
@@ -102,7 +102,7 @@ class AzureServiceClient extends msRest.ServiceClient {
     /**
      * Poll Azure long running PUT, PATCH, POST or DELETE operations.
      * @param {msRest.HttpOperationResponse} resultOfInitialRequest - result/response of the initial request which is a part of the asynchronous polling operation.
-     * @param {msRest.RequestOptions} [options] - custom request options.
+     * @param {msRest.RequestOptionsBase} [options] - custom request options.
      * @returns {Promise<msRest.HttpOperationResponse>} result - The final response after polling is complete.
      */
     getLongRunningOperationResult(resultOfInitialRequest, options) {

@@ -12,7 +12,7 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "dist/browser",
+    "outDir": "dist/browser/lib",
     "allowJs": false,
     "declaration": true,
     "declarationDir": "typings/lib",
