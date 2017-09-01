@@ -1,0 +1,8 @@
+.vscode
+node_modules/
+browser-sample.ts
+node-sample.ts
+test
+.travis.yml
+foo.js
+index.html
