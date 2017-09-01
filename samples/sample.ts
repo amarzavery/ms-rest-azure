@@ -1,7 +1,7 @@
 'use strict';
 
-import * as msRest from 'ms-rest';
-import * as msRestAzure from './lib/msRestAzure';
+import * as msRest from 'ms-rest-ts';
+import * as msRestAzure from '../lib/msRestAzure';
 const clientOptions: msRestAzure.AzureServiceClientOptions = {
   filters: [new msRest.LogFilter()]
 };

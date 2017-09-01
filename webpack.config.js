@@ -20,7 +20,7 @@ module.exports = {
         loader: 'ts-loader',
         exclude: /(node_modules|test)/,
         options: {
-          configFileName: './tsconfig.browser.json'
+          configFileName: './tsconfig.json'
         }
       }
     ]
@@ -28,14 +28,12 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     alias: {
-      moment: path.resolve('./node_modules/moment'),
-      "ms-rest-ts": path.resolve('./node_modules/ms-rest-ts/dist/node/lib/msRest.js')
+      "ms-rest-ts": path.resolve('./node_modules/ms-rest-ts/bundle.js')
     }
   },
   node: {
     fs: false,
     net: false,
-    //process: false,
     path: false,
     dns: false,
     tls: false,

@@ -19,7 +19,7 @@
     "autorest",
     "clientruntime"
   ],
-  "main": "./dist/node/lib/msRestAzure.js",
+  "main": "./dist/lib/msRestAzure.js",
   "types": "./typings/lib/msRestAzure.d.ts",
   "license": "MIT",
   "dependencies": {
@@ -45,7 +45,7 @@
     "url": "http://github.com/Azure/azure-sdk-for-node/issues"
   },
   "scripts": {
-    "tsc": "tsc -p tsconfig.node.json && tsc -p tsconfig.browser.json",
+    "tsc": "tsc -p tsconfig.json",
     "test": "npm install && npm -s run-script unit",
     "unit": "mocha -t 50000 dist/test",
     "build": "npm -s run-script tsc && webpack && node node_modules/uglify-es/bin/uglifyjs --source-map -c -m -o bundle.min.js bundle.js"
