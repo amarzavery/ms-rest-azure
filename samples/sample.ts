@@ -19,7 +19,7 @@ const apiVersion = '2017-06-01';
 // 1.4 click on try it out button.
 // 1.5 in the curl tab you will see the actual curl request that has the bearer token in it
 // 1.6 copy paste that token here. That token is valid for 1 hour
-const token = 'your-token';
+const token = 'token';
 const creds = new msRest.TokenCredentials(token);
 const client = new msRestAzure.AzureServiceClient(creds, clientOptions);
 const req: msRest.RequestPrepareOptions = {

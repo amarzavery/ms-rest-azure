@@ -1,8 +1,7 @@
-.vscode
+.vscode/
 node_modules/
-browser-sample.ts
-node-sample.ts
-test
+samples/
+test/
 .travis.yml
-foo.js
-index.html
+gulpfile.js
+.gitignore
