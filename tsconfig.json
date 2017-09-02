@@ -20,8 +20,13 @@
     "strictNullChecks": true,
     "lib": [
       "dom",
-      "es2015",
-      "es2016"
+      "dom.iterable",
+      "es5",
+      "es6",
+      "es7",
+      "esnext",
+      "esnext.asynciterable",
+      "es2015.iterable"
     ]
   },
   "compileOnSave": true,
