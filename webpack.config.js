@@ -25,17 +25,14 @@ module.exports = {
       }
     ]
   },
-  // If we are using externals then we do not need alias. With externals 
-  // the assumption is that customers will externally import/include ms-rest-ts.
-  // externals: {
-  //   "ms-rest-ts": "msRest"
-  // },
+  // ms-rest-ts is a dependency of this project. Customer is expected to manually import/include 
+  // this for browser javascript in a script tag. More info over here 
+  // https://webpack.js.org/configuration/externals/ and https://webpack.js.org/guides/author-libraries/#add-externals.
+  externals: {
+    "ms-rest-ts": "msRest"
+  },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    alias: {
-      "moment": path.resolve('./node_modules/moment/min/moment.min.js'),
-      "ms-rest-ts": path.resolve('./node_modules/ms-rest-ts/dist/lib/msRest.js')
-    }
+    extensions: [".tsx", ".ts", ".js"]
   },
   node: {
     fs: false,

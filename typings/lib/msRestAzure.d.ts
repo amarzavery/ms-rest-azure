@@ -2,5 +2,4 @@ import { AzureServiceClientOptions, AzureServiceClient } from './azureServiceCli
 import Constants from './util/constants';
 import { CloudError, CloudErrorMapper } from './cloudError';
 import { BaseResource, BaseResourceMapper } from './baseResource';
-import * as msRest from 'ms-rest-ts';
-export { AzureServiceClient, AzureServiceClientOptions, Constants, CloudError, CloudErrorMapper, BaseResource, BaseResourceMapper, msRest };
+export { AzureServiceClient, AzureServiceClientOptions, Constants, CloudError, CloudErrorMapper, BaseResource, BaseResourceMapper };
